@@ -23,7 +23,7 @@ class Equities2_1():
     enabled = True
     manageOrderConsistency = True
     simulate = True
-    saveFilesFramework = False
+    saveFilesFramework = True
     saveFilesSim = True
     strategyCode = "e2_1" #used by order tags and debug
     isEquity = True
@@ -133,7 +133,7 @@ class Equities2_1():
     #myTickers = ["TLRY", "TLT", "TM", "TME", "TNA", "TOL", "TPR", "TPTX", "TRU", "TRUE", "TSLA", "TTD", "TW", "TWLO", "TWTR", "TXN", "TZA", "UAA", "UBER", "UNG", "UPS", "UPWK", "USFD", "USO", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "VXX", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "XLC", "XLE", "XLF", "XLU", "XLV", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA", "ZS", "ZUO"]  
         
     #myTickers = ["AA", "AAL", "AMAT"]
-    ##myTickers = ["A"]
+    myTickers = ["A"]
     
     #AI
     loadAI = True
