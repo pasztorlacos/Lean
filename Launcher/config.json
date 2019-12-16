@@ -6,17 +6,27 @@
   // two predefined environments, 'backtesting' and 'live', feel free
   // to add more!
 
-  "environment": "backtesting", // "live-paper", "backtesting", "live-interactive", "live-interactive-iqfeed"
+  //"environment": "backtesting", "backtesting-monitor", "live-paper", "backtesting", "live-interactive", "live-interactive-iqfeed"
+  "environment": "backtesting",
 
   // algorithm class selector
-  "algorithm-type-name": "BasicTemplateFrameworkAlgorithm",
+  //OLD:"algorithm-type-name": "BasicTemplateFrameworkAlgorithm",
+  //"algorithm-type-name": "BasicTemplateFrameworkAlgorithm",
+  "algorithm-type-name": "BasicTemplateAlgorithm",
 
   // Algorithm language selector - options CSharp, FSharp, VisualBasic, Python, Java
-  "algorithm-language": "CSharp",
+  //OLD:"algorithm-language": "CSharp",
+  "algorithm-language": "Python",
 
   //Physical DLL location
-  "algorithm-location": "QuantConnect.Algorithm.CSharp.dll",
+  //OLD:"algorithm-location": "QuantConnect.Algorithm.CSharp.dll",
   //"algorithm-location": "../../../Algorithm.Python/BasicTemplateFrameworkAlgorithm.py",
+  //"algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/ZigZagLibraryTest.py",
+  //"algorithm-location": "../../../Algorithm.Python/Stat1.py",
+
+  "algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/Stat1.py",
+  //"algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/Solutions/SimpleLive.py",
+
   //"algorithm-location": "QuantConnect.Algorithm.FSharp.dll",
   //"algorithm-location": "QuantConnect.Algorithm.VisualBasic.dll",
   //"algorithm-location": "QuantConnect.Algorithm.Java.dll",
@@ -25,14 +35,18 @@
   //"composer-dll-directory": ".",
 
   // engine
-  "data-folder": "../../../Data/",
+  //"data-folder": "../../../Data/",
+  "data-folder": "X:/My Drive/QuantConnect/Lean/Data",
 
   // debugging configuration
+  //OLD: "debugging": false,
   "debugging": false,
-  "debugging-method": "LocalCmdline",
+  //OLD: "debugging-method": "LocalCmdline",
+  "debugging-method": "VisualStudio",
 
   // handlers
   "log-handler": "QuantConnect.Logging.CompositeLogHandler",
+
   "messaging-handler": "QuantConnect.Messaging.Messaging",
   "job-queue-handler": "QuantConnect.Queues.JobQueue",
   "api-handler": "QuantConnect.Api.Api",
@@ -40,7 +54,6 @@
   "factor-file-provider": "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider",
   "data-provider": "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider",
   "alpha-handler": "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler",
-  "data-channel-provider": "DataChannelProvider",
 
   // limits on number of symbols to allow
   "symbol-minute-limit": 10000,
@@ -58,17 +71,17 @@
   "transaction-log": "",
 
   // To get your api access token go to quantconnect.com/account
-  "job-user-id": "0",
-  "api-access-token": "",
+  "job-user-id": "79412",
+  "api-access-token": "d87414110f280b9df6dee3594ab9ac7f",
 
   // live data configuration
   "live-data-url": "ws://www.quantconnect.com/api/v2/live/data/",
   "live-data-port": 8020,
 
   // interactive brokers configuration
-  "ib-account": "",
-  "ib-user-name": "",
-  "ib-password": "",
+  "ib-account": "DU1541282",
+  "ib-user-name": "paszt686",
+  "ib-password": "lacos228",
   "ib-host": "127.0.0.1",
   "ib-port": "4002",
   "ib-agent-description": "Individual",
@@ -151,6 +164,22 @@
       "real-time-handler": "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler",
       "history-provider": "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider",
       "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler"
+    },
+
+    // defines the 'backtesting' environment
+    "backtesting-monitor": {
+      "live-mode": false,
+
+      "setup-handler": "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler",
+      "result-handler": "QuantConnect.Lean.Engine.Results.BacktestingResultHandler",
+      "data-feed-handler": "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed",
+      "real-time-handler": "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler",
+      "history-provider": "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider",
+      "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler",
+      "messaging-handler": "QuantConnect.Messaging.StreamingMessageHandler",
+      "log-handler": "QuantConnect.Logging.QueueLogHandler",
+      "desktop-http-port": "1234",
+      "desktop-exe": "../../../UserInterface/bin/Release/QuantConnect.Views.exe"
     },
 
     // defines the 'live-paper' environment
