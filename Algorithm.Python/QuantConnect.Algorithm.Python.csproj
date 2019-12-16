@@ -87,6 +87,16 @@
     <None Include="PsychSignalSentimentRegressionAlgorithm.py" />
     <Content Include="CustomDataUsingMapFileRegressionAlgorithm.py" />
     <Content Include="LiquidETFUniverseFrameworkAlgorithm.py" />
+    <None Include="PL\BasicTemplateAlgorithm.py" />
+    <Content Include="PL\eq2_1.py" />
+    <Content Include="PL\hp3.py" />
+    <Content Include="PL\pm3.py" />
+    <Content Include="PL\pmB3.py" />
+    <Content Include="PL\sim1.py" />
+    <Content Include="PL\Stat1.py" />
+    <Content Include="PL\ta1.py" />
+    <Content Include="PL\taB1.py" />
+    <Content Include="PL\var3.py" />
     <Content Include="SetHoldingsMultipleTargetsRegressionAlgorithm.py" />
     <Content Include="TradingEconomicsCalendarIndicatorAlgorithm.py" />
     <Content Include="OnEndOfDayRegressionAlgorithm.py" />

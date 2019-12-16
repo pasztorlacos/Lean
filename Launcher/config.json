@@ -24,8 +24,9 @@
   //"algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/ZigZagLibraryTest.py",
   //"algorithm-location": "../../../Algorithm.Python/Stat1.py",
 
-  "algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/Stat1.py",
+  //"algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/Stat1.py",
   //"algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/Solutions/SimpleLive.py",
+  "algorithm-location": "../../../Algorithm.Python/PL/Stat1.py",
 
   //"algorithm-location": "QuantConnect.Algorithm.FSharp.dll",
   //"algorithm-location": "QuantConnect.Algorithm.VisualBasic.dll",
