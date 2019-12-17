@@ -458,7 +458,7 @@ class MySIMPosition():
         '''
         #simMinMaxTypes=[0,1,2,3]
         #simMinMaxTypes = [0,1]
-        minMaxNo = 1
+        minMaxNo = 0
         singleMinMaxOutput = [0, 0, 0]
         if True:
             #MinMax_1
