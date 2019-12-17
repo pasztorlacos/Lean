@@ -125,7 +125,7 @@ class MyAlgo(QCAlgorithm):
         self.SetWarmUp(self.myHelpers.WarUpDays()) 
         
         #Add chartSymbol and Set Tradable Property!
-        self.chartTicker = "QQQ" #"QQQ"
+        self.chartTicker = "SPY" #"QQQ"
         self.AddEquity(self.chartTicker, self.mainResolution)
         self.chartSymbol = self.Securities[self.chartTicker].Symbol 
         self.Securities[self.chartSymbol].SetDataNormalizationMode(self.myDataNormalizationMode)

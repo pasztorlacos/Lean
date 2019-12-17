@@ -28,7 +28,7 @@ class MySIMPosition():
     hasPosition=False
     modeQuantconnect = False
     useHeader=True
-    subStatName="\\2010-_1-75"
+    subStatName="\\2010-_"
     statName = "Stat5"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\QuantConnect\\Stats\\"+statName+"\\"
@@ -500,7 +500,7 @@ class MySIMPosition():
         self.CL.simsClosed +=1
         self.isClosed = True
         
-        if self.CL.simsClosed % self.CL.debugFrequency == 0: self.algo.MyDebug(f' Total Sims Closed: {self.CL.simsClosed}')
+        if self.CL.simsClosed % self.CL.debugFrequency == 0: self.algo.MyDebug(f' ------- Total Sims Closed: {self.CL.simsClosed}')
         return
     
     def Update(self, caller, bar):

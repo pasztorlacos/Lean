@@ -1100,7 +1100,10 @@ class MyVolatility():
         else: 
             self.Value = 0.5
         self.atrVolatility.appendleft(self.Value)
-        self.atrNormVolatility.appendleft(log(1+self.Value*normMultiplier,10))
+        if 1+self.Value*normMultiplier>0:
+            self.atrNormVolatility.appendleft(log(1+self.Value*normMultiplier,10))
+        else:
+            self.atrNormVolatility.appendleft(0)
         
         self.benchmarkSymbol = self.algo.benchmarkSymbol if self.benchmarkTicker==None else self.algo.Securities[self.benchmarkTicker].Symbol
         if len(self.algo.mySymbolDict[self.benchmarkSymbol].vol.atrVolatility)!=0:
@@ -1112,7 +1115,10 @@ class MyVolatility():
             self.benchmark_atrNormVolatility = log(1.5,10)
         atrRelVolatility = self.atrVolatility[0]/self.benchmark_atrVolatility if self.benchmark_atrVolatility!=0 else 1
         self.atrRelVolatility.appendleft(atrRelVolatility)
-        self.atrNormRelVolatility.appendleft(log(1+atrRelVolatility*normMultiplier,10))
+        if 1+atrRelVolatility*normMultiplier>0:
+            self.atrNormRelVolatility.appendleft(log(1+atrRelVolatility*normMultiplier,10))
+        else:
+             self.atrNormRelVolatility.appendleft(0)
         
         self.IsReady = len(self.atrVolatility) == self.atrVolatility.maxlen
         return self.IsReady
@@ -1141,12 +1147,12 @@ class MyVolatility():
         if not relative:
             if not self.IsReady or len(self.atrVolatility)<=period: return 0
             avg = sum(list(self.atrVolatility)[0:period])/max(len(list(self.atrVolatility)[0:period]),1)
-            if avg==0 or self.atrVolatility[0]==0: return 0
+            if avg==0 or self.atrVolatility[0]<=0: return 0
             volFromAverage = log(self.atrVolatility[0]/avg,10)+0.5
         else:
             if not self.IsReady or len(self.atrRelVolatility)<=period: return 0
             avg = sum(list(self.atrRelVolatility)[0:period])/max(len(list(self.atrRelVolatility)[0:period]),1)
-            if avg==0 or self.atrRelVolatility[0]==0: return 0
+            if avg==0 or self.atrRelVolatility[0]<=0: return 0
             volFromAverage = log(self.atrRelVolatility[0]/avg,10)+0.5
         return volFromAverage
    
@@ -1155,12 +1161,18 @@ class MyVolatility():
             if not self.IsReady or len(self.atrVolatility)<=period: return 0
             if self.atrVolatility[period]==0: return 0
             change = self.atrVolatility[0]/self.atrVolatility[period]
-            volChange=log(change,10)+0.5
+            if change>0:
+                volChange=log(change,10)+0.5
+            else:
+                volChange=0
         else:
             if not self.IsReady or len(self.atrRelVolatility)<=period: return 0
             if self.atrRelVolatility[period]==0: return 0
             change = self.atrRelVolatility[0]/self.atrRelVolatility[period]
-            volChange=log(change,10)+0.5
+            if change>0:
+                volChange=log(change,10)+0.5
+            else:
+                volChange=0
         return volChange
         
     #FEATURE EXTRACTOR
