@@ -556,7 +556,7 @@ class MyZigZag():
                 if (maxZZ-minZZ)!=0:
                     zzNormalised=(self.zzPoints[i].value-minZZ*(1-margin))/(maxZZ*(1+margin)-minZZ*(1-margin))
                 else: 
-                    zzNormalised = self.zzPoints[i].value
+                    zzNormalised = 0.5 #self.zzPoints[i].value
                 features.append(zzNormalised)
                 lastZZNormalised=zzNormalised
             i+=1
