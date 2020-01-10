@@ -95,11 +95,11 @@ class MyAlgo(QCAlgorithm):
         #self.SetStartDate(2003,1,1)
         #self.SetStartDate(2004,1,1)
         #self.SetStartDate(2007,1,1)
-        #self.SetStartDate(2009,1,1)
+        self.SetStartDate(2009,1,1)
         #self.SetStartDate(2015,1,1)
         #self.SetStartDate(2016,1,1)
         #self.SetStartDate(2018,1,1)
-        self.SetStartDate(2019,1,1)
+        #self.SetStartDate(2019,1,1)
         #self.SetStartDate(datetime.now() - timedelta(days=5))  
 
         #End Date
@@ -107,12 +107,12 @@ class MyAlgo(QCAlgorithm):
         #self.SetEndDate(2003,12,31)
         #self.SetEndDate(2004,12,31)
         #self.SetEndDate(2005,12,31)
-        #self.SetEndDate(2009,12,31)
+        self.SetEndDate(2009,12,31)
         #self.SetEndDate(2010,12,31)
         #self.SetEndDate(2012,12,31)
         #self.SetEndDate(2015,12,31)
         #self.SetEndDate(2019,9,1)
-        self.SetEndDate(datetime.now())
+        #self.SetEndDate(datetime.now())
         
         #self.Portfolio.SetAccountCurrency("EUR")
         self.SetCash(100000)
