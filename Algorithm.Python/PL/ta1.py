@@ -617,7 +617,7 @@ class MyZZPoint():
 class MyPatterns():
     def __init__(self, zz):
         self.zz = zz
-        self.debug = True
+        self.debug = False
         self.roundDigits = 2
         self.isReady = False
         self.doubleTop = False
