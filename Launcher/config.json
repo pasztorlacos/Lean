@@ -26,7 +26,7 @@
 
   //"algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/Stat1.py",
   //"algorithm-location": "C:/Github/Repos/pasztorlacos/Quantconnect/Solutions/SimpleLive.py",
-  "algorithm-location": "../../../Algorithm.Python/PL/Stat1.py",
+  "algorithm-location": "../../../Algorithm.Python/PL_Stat6_fx/main.py",
 
   //"algorithm-location": "QuantConnect.Algorithm.FSharp.dll",
   //"algorithm-location": "QuantConnect.Algorithm.VisualBasic.dll",
@@ -37,7 +37,7 @@
 
   // engine
   //"data-folder": "../../../Data/",
-  "data-folder": "X:/My Drive/QuantConnect/Lean/Data",
+  "data-folder": "X:/My Drive/LeanData/2019OCT/Data",
 
   // debugging configuration
   //OLD: "debugging": false,
