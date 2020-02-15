@@ -29,9 +29,9 @@ class Fx2_1_pt_1():
     '''STRATEGY SETTINGS'''
     enabled = True
     manageOrderConsistency = True
-    simulate = False
-    saveFilesFramework = False
-    saveFilesSim = False
+    simulate = True
+    saveFilesFramework = True
+    saveFilesSim = saveFilesFramework
     strategyCodeOriginal = "fx2_1_pt_1"
     strategyCode = strategyCodeOriginal #used by order tags and debug
     isEquity = False
@@ -40,10 +40,16 @@ class Fx2_1_pt_1():
     customFeeModel = 0
     customBuyingPowerModel = 0
     #Resolution
-    resolutionMinutes = 15
-    maxWarmUpPeriod = 710
-    barPeriod =  timedelta(minutes=resolutionMinutes) #TimeSpan.FromMinutes(resolutionMinutes)
-    warmupcalendardays = round(7/5*maxWarmUpPeriod/(7*(60/resolutionMinutes))) if isEquity else round(7/5*maxWarmUpPeriod/(24*(60/resolutionMinutes)))
+    resolutionMinutes   = 15
+    resolutionMinutes_2 = 4*60
+    maxWarmUpPeriod   = 500
+    maxWarmUpPeriod_2 = 180
+    barPeriod   =  timedelta(minutes=resolutionMinutes)
+    barPeriod_2 =  timedelta(minutes=resolutionMinutes_2)
+    if isEquity:
+        warmupcalendardays = max(round(7/5*maxWarmUpPeriod/(7*(60/resolutionMinutes))), round(7/5*maxWarmUpPeriod_2/(7*(60/resolutionMinutes_2))))
+    else:
+        warmupcalendardays = max(round(7/5*maxWarmUpPeriod/(24*(60/resolutionMinutes))), round(7/5*maxWarmUpPeriod_2/(24*(60/resolutionMinutes_2))))
     #Switches
     plotIndicators = False
     #Risk Management
@@ -106,22 +112,27 @@ class Fx2_1_pt_1():
     _totalEntryFills = 0
     _totalATRpct = 0
     _lastUpdated = datetime(year = 1968, month = 6, day = 25)
-    
+  
     #PiData FX
-    myTickers = ["AUDJPY", "AUDUSD", "CHFJPY", "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "EURUSD", "GBPCHF", "GBPJPY", "GBPUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
-    myTickers = ["EURUSD", "GBPUSD", "EURGBP"]
-    myTickers = ["EURUSD"]
+    myTickers = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "AUDJPY", "CHFJPY", "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "GBPCHF", "GBPJPY"]
+    #myTickers = ["EURUSD", "GBPUSD", "EURGBP"]
+    #myTickers = ["EURUSD"]
     
     #My Selection
     #myTickers = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "USDCNH", "EURJPY", "EURSEK", "EURNOK", "USDMXN", "USDZAR", "USDSEK", "USDNOK", "EURHUF", "USDHUF"]
     #myTickers = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "USDCNH", "EURJPY"]
     #myTickers = ["EURUSD"]
-    
-    #Simulation Signals [direction, disableBars, disableCount]
-    simDict = {"L_Str": [1,8,0], "L_Rej": [1,8,0], "S_Str": [-1,8,0], "S_Rej": [-1,8,0]}
+
+    #Simulation Signals [direction, disableBars, Enabled]
+    simDict = {
+       "L_Str_": [1,8,True], "S_Str_": [1,8,True], 
+       "L_Rej_": [-1,8,True], "S_Rej_": [-1,8,True],
+       "DB_": [-1,8,True], "DT_": [-1,8,True], 
+       "TB_": [-1,8,False], "TT_": [-1,8,False],
+       "HS_": [-1,8,False], "IHS_": [-1,8,False]}
     
     #AI ----
-    loadAI = False
+    loadAI = True
     aiDict = {}
     
     aiDict['L_Str'] = {
@@ -221,102 +232,127 @@ class Fx2_1_pt_1():
         self.symbol = symbol
         self.security = self.algo.Securities[symbol]
         self.var = var
-        '''Consolidator'''
+        '''Consolidator(s)'''
         self.consolidator = TradeBarConsolidator(self.CL.barPeriod) if symbol.SecurityType == SecurityType.Equity else QuoteBarConsolidator(self.CL.barPeriod)
-        #self.consolidator = TradeBarConsolidator(1) if symbol.SecurityType == SecurityType.Equity else QuoteBarConsolidator(1)
         self.consolidator.DataConsolidated += self.OnDataConsolidated
         self.algo.SubscriptionManager.AddConsolidator(symbol, self.consolidator)
+        #Higher Timeframe
+        self.consolidator_2 = TradeBarConsolidator(self.CL.barPeriod_2) if symbol.SecurityType == SecurityType.Equity else QuoteBarConsolidator(self.CL.barPeriod_2)
+        self.consolidator_2.DataConsolidated += self.OnDataConsolidated_2
+        self.algo.SubscriptionManager.AddConsolidator(symbol, self.consolidator_2)
+        
         '''Symbol Data''' 
         self.bars_rw = RollingWindow[IBaseDataBar](100)
         self.barTimeDifference = timedelta(0)
         self.posEnabled = True
-        self.entryEnabled = False
+        #self.entryEnabled = False
         self.blockOrderCheck = False
         self.fillReleaseTime = self.algo.Time - timedelta(hours=20)
         self.fromTWS = False
         self.stateUpdateList = []
         '''Indicators'''
-        self.sma1 = SimpleMovingAverage (70)
-        self.algo.RegisterIndicator(self.symbol, self.sma1, self.consolidator)
-        self.sma2 = SimpleMovingAverage (140)
-        self.algo.RegisterIndicator(self.symbol, self.sma2, self.consolidator)
-        self.sma3 = SimpleMovingAverage (280)
-        self.algo.RegisterIndicator(self.symbol, self.sma3, self.consolidator)
-        self.sma4 = SimpleMovingAverage (420)
-        self.algo.RegisterIndicator(self.symbol, self.sma4, self.consolidator)
-        self.atr1 = AverageTrueRange(15)
+        self.atr1 = AverageTrueRange(20)
         self.algo.RegisterIndicator(self.symbol, self.atr1, self.consolidator)
-        self.atr2 = AverageTrueRange(70)
+        self.atr2 = AverageTrueRange(50)
         self.algo.RegisterIndicator(self.symbol, self.atr2, self.consolidator)
         
-        self.dch_s = DonchianChannel(7)
+        self.sma1 = SimpleMovingAverage (100)
+        self.algo.RegisterIndicator(self.symbol, self.sma1, self.consolidator)
+        self.sma2 = SimpleMovingAverage (250)
+        self.algo.RegisterIndicator(self.symbol, self.sma2, self.consolidator)
+        self.sma3 = SimpleMovingAverage (500)
+        self.algo.RegisterIndicator(self.symbol, self.sma3, self.consolidator)
+
+        self.dch_s = DonchianChannel(3)
         self.algo.RegisterIndicator(self.symbol, self.dch_s, self.consolidator)
-        self.dch0 = DonchianChannel(3)
+        self.dch0 = DonchianChannel(5)
         self.algo.RegisterIndicator(self.symbol, self.dch0, self.consolidator)
-        self.dch01 = DonchianChannel(7)
+        self.dch01 = DonchianChannel(10)
         self.algo.RegisterIndicator(self.symbol, self.dch01, self.consolidator)
         self.dch02 = DonchianChannel(20)
         self.algo.RegisterIndicator(self.symbol, self.dch02, self.consolidator)
-        self.dch1 = DonchianChannel(35)
+        self.dch1 = DonchianChannel(40)
         self.algo.RegisterIndicator(self.symbol, self.dch1, self.consolidator)
-        self.dch2 = DonchianChannel(70)
+        self.dch2 = DonchianChannel(100)
         self.algo.RegisterIndicator(self.symbol, self.dch2, self.consolidator)
-        self.dch3 = DonchianChannel(280)
+        self.dch3 = DonchianChannel(250)
         self.algo.RegisterIndicator(self.symbol, self.dch3, self.consolidator)
-        self.dch4 = DonchianChannel(420)
+        self.dch4 = DonchianChannel(500)
         self.algo.RegisterIndicator(self.symbol, self.dch4, self.consolidator)
         
-        self.rsi1 = RelativeStrengthIndex(35)
-        self.algo.RegisterIndicator(self.symbol, self.rsi1, self.consolidator)
+        self.rsi = RelativeStrengthIndex(10)
+        self.algo.RegisterIndicator(self.symbol, self.rsi, self.consolidator)
         
-        '''Indicators B'''
-        self.smaB1 = SimpleMovingAverage (70)
-        self.algo.RegisterIndicator(self.symbol, self.sma1, Resolution.Daily)
-        
-        '''Symbol State and Features'''
-        self.longSignalDisabledBars = 0
-        self.shortSignalDisabledBars = 0
-        self.longDisabledBars = 0
-        self.shortDisabledBars = 0
-        self.longSimDisabledBars = 0
-        self.shortSimDisabledBars = 0
-
-        self.state_sma1 = MyMAState (self, self.sma1, self.sma2)
-        self.state_sma2 = MyMAState (self, self.sma2, self.sma3)
-        self.state_sma3 = MyMAState (self, self.sma3, self.sma4)
-        self.state_sma4 = MyMAState (self, self.sma4)
-
-        self.state_dch_s = MyDCHState (self, self.dch_s, self.dch2)
-        self.state_dch0 = MyDCHState (self, self.dch0, self.dch1)
-        self.state_dch1 = MyDCHState (self, self.dch1, self.dch2)
-        self.state_dch2 = MyDCHState (self, self.dch2, self.dch3)
-        self.state_dch3 = MyDCHState (self, self.dch3, self.dch4)
-        self.state_dch4 = MyDCHState (self, self.dch4)
-
-        self.myRelativePrice = MyRelativePrice(self, self.algo, self.symbol, "RelPrice", 100, self.atr1)
+        self.myRelativePrice = MyRelativePrice(self, self.algo, self.symbol, "RelPricee", 100, self.atr1)
         self.algo.RegisterIndicator(self.symbol, self.myRelativePrice, self.consolidator)
         
-        self.zz1 = MyZigZag(self, self.algo, self.symbol, name='zz1', period=100, atr=self.atr1)
-        self.algo.RegisterIndicator(self.symbol, self.zz1, self.consolidator)
+        self.zz = MyZigZag(self, self.algo, self.symbol, name='zz', period=500, atr=self.atr1, lookback=10, thresholdType=2, threshold=10)
+        self.algo.RegisterIndicator(self.symbol, self.zz, self.consolidator)
         
-        self.vol = MyVolatility(self, self.algo, self.symbol, name='vol_', period=110, atr=self.atr1)
+        self.vol = MyVolatility(self, self.algo, self.symbol, name='vol', period=150, atr=self.atr1)
         self.algo.RegisterIndicator(self.symbol, self.vol, self.consolidator)
-
+        
         #self.priceNormaliser = MyPriceNormaliser(self, self.algo, self.symbol, "Normaliser", 100)
         #self.algo.RegisterIndicator(self.symbol, self.priceNormaliser, self.consolidator)
 
+        '''Indicators Higher Timeframe'''
+        self.atr1_2 = AverageTrueRange(15)
+        self.algo.RegisterIndicator(self.symbol, self.atr1_2, self.consolidator_2)
+        self.sma1_2 = SimpleMovingAverage (60)
+        self.algo.RegisterIndicator(self.symbol, self.sma1_2, self.consolidator_2)
+        self.sma2_2 = SimpleMovingAverage (120)
+        self.algo.RegisterIndicator(self.symbol, self.sma2_2, self.consolidator_2)
+        self.dch1_2 = DonchianChannel(60)
+        self.algo.RegisterIndicator(self.symbol, self.dch1_2, self.consolidator_2)
+        self.dch2_2 = DonchianChannel(120)
+        self.algo.RegisterIndicator(self.symbol, self.dch2_2, self.consolidator_2)
+        self.rsi_2 = RelativeStrengthIndex(10)
+        self.algo.RegisterIndicator(self.symbol, self.rsi_2, self.consolidator_2)
+        
+        self.myRelativePrice_2 = MyRelativePrice(self, self.algo, self.symbol, "RelPrice_2", 100, self.atr1_2)
+        self.algo.RegisterIndicator(self.symbol, self.myRelativePrice_2, self.consolidator_2)
+        
+        self.zz_2 = MyZigZag(self, self.algo, self.symbol, name='zz_2', period=150, atr=self.atr1_2, lookback=6, thresholdType=2, threshold=10)
+        self.algo.RegisterIndicator(self.symbol, self.zz_2, self.consolidator_2)
+        
+        self.vol_2 = MyVolatility(self, self.algo, self.symbol, name='vol_2', period=110, atr=self.atr1_2)
+        self.algo.RegisterIndicator(self.symbol, self.vol_2, self.consolidator_2)
+        
+        '''Symbol State and Features'''
+        self.state_sma1 = MyMAState (self, self.sma1, self.sma2)
+        self.state_sma2 = MyMAState (self, self.sma2, self.sma3)
+        self.state_sma3 = MyMAState (self, self.sma3, self.sma1_2)
+        self.state_sma1_2 = MyMAState (self, self.sma1_2, self.sma2_2)
+        self.state_sma2_2 = MyMAState (self, self.sma2_2)
+
+        self.state_dch_s = MyDCHState (self, self.dch_s, self.dch2, name='s')
+        self.state_dch0 = MyDCHState (self, self.dch0, self.dch1, name='0')
+        self.state_dch1 = MyDCHState (self, self.dch1, self.dch2, name='1')
+        self.state_dch2 = MyDCHState (self, self.dch2, self.dch3, name='2')
+        self.state_dch3 = MyDCHState (self, self.dch3, self.dch4, name='3')
+        self.state_dch4 = MyDCHState (self, self.dch4, self.dch1_2, name='4')
+        self.state_dch1_2 = MyDCHState (self, self.dch1_2, self.dch2_2, name='1_2')
+        self.state_dch2_2 = MyDCHState (self, self.dch2_2, name='2_2')
+
+        '''Signals'''
         self.barStrength1 = MyBarStrength(self, self.algo, self.symbol, name='barStrength1', period=10, atr=self.atr1, lookbackLong=2, lookbackShort=2, \
-                priceActionMinATRLong=1.5, priceActionMaxATRLong=2.5, priceActionMinATRShort=1.25, priceActionMaxATRShort=2.25, referenceTypeLong='Close', referenceTypeShort='Close')
+                priceActionMinATRLong=1.5, priceActionMaxATRLong=2.5, priceActionMinATRShort=1.5, priceActionMaxATRShort=2.5, referenceTypeLong='Close', referenceTypeShort='Close')
         self.algo.RegisterIndicator(self.symbol, self.barStrength1, self.consolidator)
         
         self.barRejection1 = MyBarRejection(self, self.algo, self.symbol, name='barRejection1', period=10, atr=self.atr1, lookbackLong=3, lookbackShort=3, \
-               rejectionPriceTravelLong=2.0, rejectionPriceTravelShort=2.0, rejectionPriceRangeLong=1.0, rejectionPriceRangeShort=1.0, referenceTypeLong='Close', referenceTypeShort='Close')
+               rejectionPriceTravelLong=1.75, rejectionPriceTravelShort=1.75, rejectionPriceRangeLong=0.75, rejectionPriceRangeShort=0.75, referenceTypeLong='Close', referenceTypeShort='Close')
         self.algo.RegisterIndicator(self.symbol, self.barRejection1, self.consolidator)
         
         '''Signals and Events string'''
         self.signals = ''
         self.events = ''
-        
+
+        '''Disable Bars'''
+        self.longDisabledBars = 0
+        self.shortDisabledBars = 0
+        self.longSimDisabledBars = 0
+        self.shortSimDisabledBars = 0
+
         '''Set up AI models'''
         self.signalDisabledBars = {}
         for aiKey, aiObj in self.CL.aiDict.items():
@@ -328,6 +364,11 @@ class Fx2_1_pt_1():
                 aiObj["model"] = hp3.MyModelLoader.LoadModelTorch(self, aiObj["modelURL"], existingmodel=aiObj["model"])
                 self.algo.Debug(f' Torch MODEL ({aiKey}) LOADED from url: {aiObj["modelURL"]}')
             self.signalDisabledBars[aiKey] = 0
+        
+        #Initialize signalDisabledBarsSim 
+        self.signalDisabledBarsSim = {}
+        for simKey, simObj in self.CL.simDict.items():
+            self.signalDisabledBarsSim[simKey] = 0
 
         #SET FILES TO BE SAVED AT THE END OF SIMULATION
         if self.CL.simulate:
@@ -359,9 +400,9 @@ class Fx2_1_pt_1():
         for i in self.stateUpdateList:
             i.Update(self, bar)
 
-        if not self.CL.enabled or self.algo.IsWarmingUp: return
-
-        if not self.IsReady() or not self.WasJustUpdated(self.algo.Time) or not self.posEnabled: 
+        if not self.CL.enabled or self.algo.IsWarmingUp or not self.posEnabled and not self.IsReady() or not self.WasJustUpdated(self.algo.Time):
+            self.signals = ''
+            self.events = ''
             return
 
         '''VOLATILITY CUTOFF
@@ -389,26 +430,37 @@ class Fx2_1_pt_1():
         '''
         loadFeatures1, loadFeatures2 = False, False
         for aiKey, aiObj in self.CL.aiDict.items():
-            aiObj["signal"] = aiObj["enabled"] and re.search('(.+)'+str(aiKey)+'(.+)', self.signals) and aiObj["firstTradeHour"] <= self.algo.Time.hour and self.algo.Time.hour <= aiObj["lastTradeHour"]
+            aiObj["signal"] = aiObj["enabled"] and re.search(aiKey, self.signals) and aiObj["firstTradeHour"] <= self.algo.Time.hour and self.algo.Time.hour <= aiObj["lastTradeHour"]
             if aiObj["signal"]:
                 if aiObj["rawFeatures"]=="rawFeatures1": loadFeatures1 = True
                 if aiObj["rawFeatures"]=="rawFeatures2": loadFeatures2 = True
         
+        '''SIMULATION SIGNALS
+        '''
+        longTriggerSim, shortTriggerSim = False, False
+        #simObj : [direction, disableBars, enabled]
+        for simKey, simObj in self.CL.simDict.items():
+            self.signalDisabledBarsSim[simKey] = max(0, self.signalDisabledBarsSim[simKey]-1)
+            if self.CL.simulate and simObj[2] and self.signalDisabledBarsSim[simKey]==0 and re.search(simKey, self.signals):
+                self.signalDisabledBarsSim[simKey] = simObj[1]
+                if   simObj[0]== 1:  longTriggerSim = True
+                elif simObj[0]==-1: shortTriggerSim = True
+
         '''FEATURES
         '''
-        if loadFeatures1:
-            self.rawFeatures1 = [self.state_sma1.FeatureExtractor(Type=1), self.state_sma2.FeatureExtractor(Type=1), self.state_sma3.FeatureExtractor(Type=1), \
-                            self.state_dch0.FeatureExtractor(Type=6), self.state_dch1.FeatureExtractor(Type=6), self.state_dch2.FeatureExtractor(Type=6), self.state_dch3.FeatureExtractor(Type=6), \
-                            self.myRelativePrice.FeatureExtractor(Type=1, normalizationType=1, lookbacklist=[3,7,14,35,70], featureMask=[0,0,1,0]), \
-                            self.vol.FeatureExtractor(Type=51, lookbacklist=[15,35,70,100]), \
-                            self.zz1.FeatureExtractor(listLen=10, Type=11), self.zz1.FeatureExtractor(listLen=10, Type=21)]
+        if loadFeatures1 or (longTriggerSim or shortTriggerSim):
+            self.rawFeatures1 = [self.state_sma1.FeatureExtractor(Type=11), self.state_sma2.FeatureExtractor(Type=11), self.state_sma3.FeatureExtractor(Type=11), self.state_sma1_2.FeatureExtractor(Type=11), self.state_sma2_2.FeatureExtractor(Type=11), \
+                            self.state_dch0.FeatureExtractor(Type=6), self.state_dch1.FeatureExtractor(Type=6), self.state_dch2.FeatureExtractor(Type=6), self.state_dch3.FeatureExtractor(Type=6), self.state_dch4.FeatureExtractor(Type=6), self.state_dch1_2.FeatureExtractor(Type=6), \
+                            self.myRelativePrice.FeatureExtractor(Type=1, normalizationType=1, lookbacklist=[3,7,14,35,70], featureMask=[0,0,1,0]), self.myRelativePrice_2.FeatureExtractor(Type=1, normalizationType=1, lookbacklist=[10,35,70], featureMask=[0,0,1,0]), \
+                            self.vol.FeatureExtractor(Type=51, lookbacklist=[15,35,70,100]), self.vol_2.FeatureExtractor(Type=51, lookbacklist=[10,35,70]), \
+                            self.zz.FeatureExtractor(listLen=20, Type=11), self.zz.FeatureExtractor(listLen=20, Type=21), self.zz_2.FeatureExtractor(listLen=10, Type=11), self.zz_2.FeatureExtractor(listLen=10, Type=21)]
         
-        if loadFeatures2:    
+        if loadFeatures2 or (longTriggerSim or shortTriggerSim):    
             self.rawFeatures2 = [self.state_sma1.FeatureExtractor(Type=1), self.state_sma2.FeatureExtractor(Type=1), self.state_sma3.FeatureExtractor(Type=1), \
                             self.state_dch0.FeatureExtractor(Type=6), self.state_dch1.FeatureExtractor(Type=6), self.state_dch2.FeatureExtractor(Type=6), self.state_dch3.FeatureExtractor(Type=6), \
                             self.myRelativePrice.FeatureExtractor(Type=1, normalizationType=1, lookbacklist=[3,7,14,35,70], featureMask=[0,0,1,1]), \
                             self.vol.FeatureExtractor(Type=5, lookbacklist=[15,35,70,100]), \
-                            self.zz1.FeatureExtractor(listLen=10, Type=11), self.zz1.FeatureExtractor(listLen=10, Type=21)]
+                            self.zz.FeatureExtractor(listLen=10, Type=11), self.zz.FeatureExtractor(listLen=10, Type=21)]
         
         for aiObj in self.CL.aiDict.values():
             if aiObj["enabled"] and aiObj["signal"]: 
@@ -430,7 +482,7 @@ class Fx2_1_pt_1():
             #This is for Stat5 signal compatibility
             self.signalDisabledBars[aiKey] = max(self.signalDisabledBars[aiKey]-1,0)
             #Long
-            if not (longTrigger or shortTrigger) and aiObj["enabled"] and aiObj["signal"] and aiObj["dfFilterPassed"] and self.signalDisabledBars[aiKey]==0:
+            if self.CL.loadAI and not (longTrigger or shortTrigger) and aiObj["enabled"] and aiObj["signal"] and aiObj["dfFilterPassed"] and self.signalDisabledBars[aiKey]==0:
                 aiObj["model"].eval()
                 trigger = aiObj["model"].Predict(aiObj["features"])
                 if trigger and aiObj["direction"]==1:
@@ -445,11 +497,12 @@ class Fx2_1_pt_1():
 
         #Feature Debug
         if False: #and self.symbol == self.algo.Securities['APRN'].Symbol
-            self.algo.MyDebug(f'Signal: {self.symbol} Feat8_2:{round(self.vol.FeatureExtractor(Type=5, lookbacklist=[15,35,70,100])[2],3)}')
+            #self.algo.MyDebug(f'Signal: {self.symbol} Feat8_2:{round(self.vol.FeatureExtractor(Type=5, lookbacklist=[15,35,70,100])[2],3)}')
             if True: # and self.algo.Time > datetime(2019, 2, 6, 12, 00) and self.algo.Time <= datetime(2019, 2, 6, 13, 00):
-                self.PrintFeatures(df_short)
+                df_debug = self.algo.myHelpers.UnpackFeatures(self.rawFeatures1,  featureType=1, featureRegex='Feat', reshapeTuple=None)
+                self.PrintFeatures(df_debug, negativeOnly=True)
                 pass
-            self.algo.MyDebug(f'Predict2: {self.CL.modelShort.Predict2(myFeaturesShort)}')
+            #self.algo.MyDebug(f'Predict2: {self.CL.modelShort.Predict2(myFeaturesShort)}')
             #self.algo.MyDebug(f' Short prediction: {shortTrigger}')
       
         '''POSITION ENTRY/FLIP/CLOSE
@@ -468,28 +521,20 @@ class Fx2_1_pt_1():
 
         '''SIMULATION CALL
         '''
-        longTriggerSim, shortgTriggerSim = False, False
-        #simObj : [direction, disableBars, disableCount]
-        for simKey, simObj in self.CL.simDict.items():
-            simObj[2] = max(0, simObj[2])
-            if re.search('(.+)'+str(simKey)+'(.+)', self.signals):
-                if simObj[0]==1 and simObj[2]==0:
-                    simObj[2]=simObj[1]
-                    longTriggerSim = True
-                elif simObj[0]==-1 and simObj[2]==0:
-                    simObj[2]=simObj[1]
-                    shorTriggerSim = True
-        
+        debugSim  = False
+        if longTriggerSim or shortTriggerSim: myFeatures = self.rawFeatures1
         self.longSimDisabledBars=max(self.longSimDisabledBars-1,0)
         self.shortSimDisabledBars=max(self.shortSimDisabledBars-1,0)
-        simTradeTypes=[0,2,3,4,7,8] #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] 
+        simTradeTypes=[0,2,3,4,7,8,10] #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] 
         simMinMaxTypes=[0,1] #[0,1,2,3]
         lastEntryDate = datetime(year = 3019, month = 10, day = 7)
         if self.CL.simulate and longTriggerSim:
+            if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Long: {self.signals}')
             sim = MySIMPosition(self, direction=1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes)
             #use 0 if signalspecific
             self.longSimDisabledBars=0
-        if self.CL.simulate and shorTriggerSim:
+        if self.CL.simulate and shortTriggerSim:
+            if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Short: {self.signals}')
             sim = MySIMPosition(self, direction=-1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes) 
             #use 0 if signalspecific
             self.shortSimDisabledBars=0
@@ -497,15 +542,23 @@ class Fx2_1_pt_1():
         '''Reset strategyCode, Signals and Evens for the next bar
         '''
         self.CL.strategyCode = self.CL.strategyCodeOriginal 
+        if False and re.search('ABCD_|ABCD_', self.signals): self.algo.MyDebug(f' {self.symbol} self.signals before reset: {self.signals}')
+        #if False and self.zz.patterns.doubleTop: self.algo.MyDebug(f' {self.symbol} self.signals before reset: {self.signals}')
         self.signals = ''
         self.events = ''
         return
+    
+    '''
+    On Consolidated HIGHER TIMEFRAME
+    '''
+    def OnDataConsolidated_2(self, sender, bar):
+        pass
         
     '''
     Update Status
     '''
     def IsReady(self):
-        indiacatorsReady = self.bars_rw.IsReady and self.dch4.IsReady
+        indiacatorsReady = self.dch2_2.IsReady
         if False and indiacatorsReady:
             self.algo.MyDebug(" Consolidation Is Ready " + str(self.bars_rw.IsReady) + str(self.dch2.IsReady) + str(self.WasJustUpdated(self.algo.Time)))
         return indiacatorsReady
@@ -514,10 +567,12 @@ class Fx2_1_pt_1():
         return self.bars_rw.Count > 0 and (currentTime - self.barTimeDifference - self.bars_rw[0].EndTime) < timedelta(seconds=10) \
                 and (currentTime - self.barTimeDifference - self.bars_rw[0].EndTime).total_seconds() > timedelta(seconds=-10).total_seconds()
     
-    def PrintFeatures(self, df):
+    def PrintFeatures(self, df, negativeOnly=False):
         df = df.filter(regex = 'Feat')
         for col in df:
-            self.algo.MyDebug(f' {col}: {df.loc[df.index[0], col]}')
+            item = df.loc[df.index[0], col]
+            if not negativeOnly or (negativeOnly and item<0):
+                self.algo.MyDebug(f' {col}: {item}')
             
     def TestPredict(self, model, features):
         device = 'cpu'
@@ -527,8 +582,7 @@ class Fx2_1_pt_1():
             x_sample = torch.from_numpy(x_sample.reshape(-1,features)).float().to(device)
             y_hat = model.Predict2(x_sample)
             self.algo.MyDebug(f'{y_hat}')
-      
-    
+ 
 '''
 TORCH MODEL(S)
 '''

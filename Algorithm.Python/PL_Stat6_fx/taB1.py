@@ -24,8 +24,8 @@ class MyBarStrength():
         self.algo = algo
         self.symbol = symbol
         self.name = name
-        self.name_L = f'-L_Str_{lookbackLong}_{round(priceActionMinATRLong,1)}_{round(priceActionMaxATRLong,1)}'
-        self.name_S = f'-S_Str_{lookbackShort}_{round(priceActionMinATRShort,1)}_{round(priceActionMaxATRShort,1)}'
+        self.name_L = f'L_Str_{lookbackLong}_{round(priceActionMinATRLong,2)}_{round(priceActionMaxATRLong,2)}-'
+        self.name_S = f'S_Str_{lookbackShort}_{round(priceActionMinATRShort,2)}_{round(priceActionMaxATRShort,2)}-'
         self.period = period
         self.atr = atr
         self.lookbackLong = lookbackLong
@@ -115,8 +115,8 @@ class MyBarRejection():
         self.algo = algo
         self.symbol = symbol
         self.name = name
-        self.name_L = f'-L_Rej_{lookbackLong}_{round(rejectionPriceTravelLong,1)}_{round(rejectionPriceRangeLong,1)}'
-        self.name_S = f'-S_Rej_{lookbackShort}_{round(rejectionPriceTravelShort,1)}_{round(rejectionPriceRangeShort,1)}'
+        self.name_L = f'L_Rej_{lookbackLong}_{round(rejectionPriceTravelLong,2)}_{round(rejectionPriceRangeLong,2)}-'
+        self.name_S = f'S_Rej_{lookbackShort}_{round(rejectionPriceTravelShort,2)}_{round(rejectionPriceRangeShort,2)}-'
         self.period = period
         self.atr = atr
         self.lookbackLong = lookbackLong

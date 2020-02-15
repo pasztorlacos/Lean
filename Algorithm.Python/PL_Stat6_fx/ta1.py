@@ -91,14 +91,16 @@ class MyRelativePrice():
         Type==1: single list
         Type==2: list of lists each self.performance()'''
         features = []
+        #!!! deleted=+1 bug fixed but it does not effect ed2_1_pt_1A and ed2_1_pt_1B as after the first deletion  deleted+=1==deleted=+1 amd there is no further deletion after the seconf one where deleted val is incorrect.
         if Type==1:
             for lookback in lookbacklist:
                 performance = self.Performance(lookback, normalizationType)
                 deleted=0
+                #This is horribly complicated, so to be refactored to templist.append(performance(i) if mask 1) and then features.extend(templist)
                 for i in range(len(featureMask)):
                     if featureMask[i]==0: 
                         del performance[i-deleted]
-                        deleted=+1
+                        deleted+=1
                 features.extend(performance)
         elif Type==2:
             for lookback in lookbacklist:
@@ -107,7 +109,7 @@ class MyRelativePrice():
                 for i in range(len(featureMask)):
                     if featureMask[i]==0: 
                         del performance[i-deleted]
-                        deleted=+1
+                        deleted+=1
                 features.append(performance)
         return features
 '''
@@ -726,18 +728,27 @@ class MyPatterns():
         self.abcdS = False
         
     def Update(self):
+        priceUnitType = 2 #1 in Stat5
         if len(self.zz.zzPoints) <= 10:
             self.isReady = False
+            if False and self.debug and not self.zz.algo.IsWarmingUp and not self.isReady and not self.zz.caller.CL.isEquity: self.zz.algo.MyDebug(f' Symbol:{self.zz.symbol} zz:{self.zz.name} MyPatterns is not ready. zz points:{len(self.zz.zzPoints)}')
             return False
+        if False and self.debug and not self.zz.algo.IsWarmingUp and not self.zz.caller.CL.isEquity: self.zz.algo.MyDebug(f' Symbol:{self.zz.symbol} zz:{self.zz.name} zz points:{len(self.zz.zzPoints)}')
         bar=self.zz.bars[0]
-        priceUnit = self.zz.priceUnit
+        if priceUnitType==1:
+            priceUnit = self.zz.priceUnit
+        elif priceUnitType==2:
+            #Force ATR even if zz thresholdType==1
+            priceUnit = self.zz.atr.Current.Value
         A, B, C, D, E, F, G, H, I, J = self.zz.zzPoints[0:10]
-
+        
         #Tops and Bottoms
         tolerance1 = priceUnit*1 #Same line
         tolerance2 = priceUnit*2 #Max Price move from extremum
         tolerance3 = priceUnit*0 #Min Price move from extremum
         channel1 = priceUnit*5 #Minimum Channel Size
+        if False and self.debug: self.zz.algo.MyDebug(f' Symbol:{self.zz.symbol} zz:{self.zz.name} priceUnit:{priceUnit} A:{A.value} B:{B.value} C:{C.value}')
+        
         #Double Top and Bottom
         self.doubleTop = False
         self.doubleBottom = False
@@ -745,13 +756,13 @@ class MyPatterns():
                 and abs(A.value-bar.Close)>tolerance3 and abs(A.value-bar.Close)<=tolerance2:
             if A.trendCount>0 and A.value>B.value and A.value>bar.Close:
                 self.doubleTop = True
-                self.zz.caller.signals += '-DT'
+                self.zz.caller.signals += f'DT_{self.zz.name}-'
                 if False and self.debug: self.zz.algo.MyDebug("Symbol:{}, Double Top ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))
             if A.trendCount<0 and A.value<B.value and A.value<bar.Close:
                 self.doubleBottom = True
-                self.zz.caller.signals += '-DB'
+                self.zz.caller.signals += f'DB_{self.zz.name}-'
                 if False and self.debug: self.zz.algo.MyDebug("Symbol:{}, Double Bottom ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))
@@ -762,13 +773,13 @@ class MyPatterns():
                 and abs(A.value-bar.Close)>tolerance3 and abs(A.value-bar.Close)<=tolerance2:
             if A.trendCount>0 and A.value>B.value and A.value>bar.Close:
                 self.tripleTop = True
-                self.zz.caller.signals += '-TT'
+                self.zz.caller.signals += f'TT_{self.zz.name}-'
                 if False and self.debug: self.zz.algo.MyDebug("Symbol:{}, triple Top ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))
             if A.trendCount<0 and A.value<B.value and A.value<bar.Close:
                 self.tripleBottom = True
-                self.zz.caller.signals += '-TB'
+                self.zz.caller.signals += f'TB_{self.zz.name}-'
                 if False and self.debug: self.zz.algo.MyDebug("Symbol:{}, triple Bottom ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))
@@ -784,13 +795,13 @@ class MyPatterns():
         if abs(E.value-A.value)<tolerance1 and abs(D.value-B.value)<tolerance1 and abs(C.value-A.value)>tolerance4:
             if A.trendCount>0 and C.value>A.value and abs(A.value-bar.Close)<tolerance2 and abs(A.value-bar.Close)>tolerance3 and A.value>bar.Close:
                 self.hs = True
-                self.zz.caller.signals += '-HS'
+                self.zz.caller.signals += f'HS_{self.zz.name}-'
                 if False and self.debug: self.zz.algo.MyDebug("Symbol:{}, H&S ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))
             if A.trendCount<0 and C.value<A.value and abs(A.value-bar.Close)<tolerance2 and abs(A.value-bar.Close)>tolerance3 and A.value<bar.Close:
                 self.ihs = True
-                self.zz.caller.signals += '-IHS'
+                self.zz.caller.signals += f'IHS_{self.zz.name}-'
                 if False and self.debug: self.zz.algo.MyDebug("Symbol:{}, Inverse H&S ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))        
@@ -815,13 +826,13 @@ class MyPatterns():
                     and abs(A.value-bar.Close)>tolerance6 and abs(A.value-bar.Close)<tolerance5:
             if A.trendCount<0 and A.value<B.value and A.value-C.value>tolerance4:
                 self.abcdL = True
-                self.zz.caller.signals += '-L_ABCD'
+                self.zz.caller.signals += f'L_ABCD_{self.zz.name}-'
                 if True and self.debug: self.zz.algo.MyDebug("Symbol:{}, ABCD Long ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))        
             if A.trendCount>0 and A.value>B.value and C.value-A.value>tolerance4:
                 self.abcdS = True
-                self.zz.caller.signals += '-S_ABCD'
+                self.zz.caller.signals += f'S_ABCD_{self.zz.name}-'
                 if True and self.debug: self.zz.algo.MyDebug("Symbol:{}, ABCD Short ZZ:{}, barClose:{}, zzValue:{}, zzEndTime:{}, Index:{}, TrendCount:{}".format( \
                     str(self.zz.symbol), str(A.zz), str(round(bar.Close,2)), \
                     str(round(A.value,self.roundDigits)), str(A.endTime), str(A.index), str(A.trendCount),))  
@@ -881,8 +892,8 @@ class MyDCHState():
         self.caller.stateUpdateList.append(self)
         self.atr = 0
         self.name = name
-        self.name_L = f'-L_DCH_{name}'
-        self.name_S = f'-S_DCH_{name}'
+        self.name_L = f'L_DCH_{name}-'
+        self.name_S = f'S_DCH_{name}-'
         
         self.size = 0 #in atr
         self.sizeRef = 0 #in atr
@@ -1032,8 +1043,8 @@ class MyMAState():
         self.referenceMA = referenceMA
         self.caller.stateUpdateList.append(self)
         self.atr = 0
-        self.name_L = f'-L_MA_{baseMA.Period}_{referenceMA.Period}' if referenceMA!=None else f'-L_MA_{baseMA.Period}_na'
-        self.name_S = f'-S_MA_{baseMA.Period}_{referenceMA.Period}' if referenceMA!=None else f'-S_MA_{baseMA.Period}_na'
+        self.name_L = f'L_MA_{baseMA.Period}_{referenceMA.Period}-' if referenceMA!=None else f'-L_MA_{baseMA.Period}_na-'
+        self.name_S = f'S_MA_{baseMA.Period}_{referenceMA.Period}-' if referenceMA!=None else f'-S_MA_{baseMA.Period}_na-'
         
         self.diff = 0 #in atr
         self.breakMA = 0
@@ -1167,6 +1178,11 @@ class MyMAState():
         features=[]
         if Type==1:
             features=[self.diff/atrNormaliser+bias, self.priceFromMA/atrNormaliser+bias, self.priceFromBreak/2/atrNormaliser+bias]
+        elif Type==11:
+            if self.referenceMA!=None:
+                features=[self.diff/atrNormaliser+bias, self.priceFromMA/atrNormaliser+bias, self.priceFromBreak/2/atrNormaliser+bias]
+            else:
+                features=[self.priceFromMA/atrNormaliser+bias, self.priceFromBreak/2/atrNormaliser+bias]
         elif Type==2:
             features=[self.lastHighFromBreak/2/atrNormaliser+bias*0, self.lastHighFromMA/atrNormaliser+bias*0, self.lastLowFromBreak/2/atrNormaliser+bias*2, self.lastLowFromMA/atrNormaliser+bias*2]
         elif Type==3:

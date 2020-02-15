@@ -163,7 +163,7 @@ class Equities2_1_pt_1():
     #PiTrading_1_4
     #myTickers = ["C", "CAKE", "CARS", "CBOE", "CCJ", "CDLX", "CELG", "CHK", "CHWY", "CIEN", "CLDR", "CLF", "CLNE", "CMCSA", "CME", "CMG", "CMI", "CNDT", "COP", "COST", "COUP", "CPB", "CREE", "CRM", "CRSP", "CRUS", "CRWD", "CSX", "CTRP", "CTSH", "CVS", "DBI", "DBX", "DD", "DE", "DECK", "DELL", "DG"]  
     #myTickers = ["AA", "AAL", "AMAT"]
-    myTickers = ["AES"]
+    myTickers = ["AMAT"]
     
     #AI ----
     loadAI = False
@@ -454,7 +454,7 @@ class Equities2_1_pt_1():
         '''
         loadFeatures1, loadFeatures2 = False, False
         for aiKey, aiObj in self.CL.aiDict.items():
-            aiObj["signal"] = aiObj["enabled"] and re.search('(.+)'+str(aiKey)+'(.+)', self.signals) and aiObj["firstTradeHour"] <= self.algo.Time.hour and self.algo.Time.hour <= aiObj["lastTradeHour"]
+            aiObj["signal"] = aiObj["enabled"] and re.search(aiKey, self.signals) and aiObj["firstTradeHour"] <= self.algo.Time.hour and self.algo.Time.hour <= aiObj["lastTradeHour"]
             if aiObj["signal"]:
                 if aiObj["rawFeatures"]=="rawFeatures1": loadFeatures1 = True
                 if aiObj["rawFeatures"]=="rawFeatures2": loadFeatures2 = True

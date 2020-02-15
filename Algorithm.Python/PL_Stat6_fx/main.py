@@ -74,6 +74,11 @@ class MyAlgo(QCAlgorithm):
         self.openMarketOrders = []     
         self.myVaR = None
         self.foreignVaR = None
+
+        '''PositionManager instantiation'''
+        self.myPositionManager = MyPositionManager(self)
+        self.myPositionManagerB = MyPositionManagerB(self)
+        self.consistencyStartUpReleaseTime = self.Time - timedelta(hours=20)
         
         '''DataNormalizationMode for Equities'''
         self.myDataNormalizationMode = DataNormalizationMode.SplitAdjusted  #DataNormalizationMode.Raw, DataNormalizationMode.SplitAdjusted, DataNormalizationMode.Adjusted, DataNormalizationMode.TotalReturn
@@ -86,11 +91,6 @@ class MyAlgo(QCAlgorithm):
         #The first strategíy is for benchmarksymbol only, so to speed up warmup
         self.myStrategyClassList[0].warmupcalendardays = self.myStrategyClassList[1].warmupcalendardays
 
-        '''PositionManager instantiation'''
-        self.myPositionManager = MyPositionManager(self)
-        self.myPositionManagerB = MyPositionManagerB(self)
-        self.consistencyStartUpReleaseTime = self.Time - timedelta(hours=20)
-
         '''BACKTEST DATES and SETTINGS'''
         #Start Date
         #self.SetStartDate(2000,1,1)
@@ -99,11 +99,11 @@ class MyAlgo(QCAlgorithm):
         #self.SetStartDate(2004,1,1)
         #self.SetStartDate(2007,1,1)
         #self.SetStartDate(2009,1,1)
-        #self.SetStartDate(2014,1,1)
+        self.SetStartDate(2014,1,1)
         #self.SetStartDate(2016,1,1)
         #self.SetStartDate(2017,1,1)
-        self.SetStartDate(2019,9,1)
-        #self.SetStartDate(2020,1,1)
+        #elf.SetStartDate(2018,10,1)
+        #self.SetStartDate(2019,6,1)
         #self.SetStartDate(datetime.now() - timedelta(days=30))  
 
         #End Date

@@ -28,8 +28,8 @@ class MySIMPosition():
     hasPosition=False
     modeQuantconnect = False
     useHeader=True
-    subStatName="\\2010-_"
-    statName = "Stat5"+subStatName
+    subStatName="\\Dev_"
+    statName = "Stat6_fx"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\QuantConnect\\Stats\\"+statName+"\\"
     saveFiles = [] #List of lists or tuples (filePath, fileName)
