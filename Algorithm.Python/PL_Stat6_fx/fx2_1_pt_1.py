@@ -528,12 +528,12 @@ class Fx2_1_pt_1():
         simTradeTypes=[0,2,3,4,7,8,10] #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] 
         simMinMaxTypes=[0,1] #[0,1,2,3]
         lastEntryDate = datetime(year = 3019, month = 10, day = 7)
-        if self.CL.simulate and longTriggerSim:
+        if self.CL.simulate and longTriggerSim and (self.algo.Time<self.algo.simEndDate or self.algo.simEndDate==None):
             if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Long: {self.signals}')
             sim = MySIMPosition(self, direction=1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes)
             #use 0 if signalspecific
             self.longSimDisabledBars=0
-        if self.CL.simulate and shortTriggerSim:
+        if self.CL.simulate and shortTriggerSim and (self.algo.Time<self.algo.simEndDate or self.algo.simEndDate==None):
             if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Short: {self.signals}')
             sim = MySIMPosition(self, direction=-1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes) 
             #use 0 if signalspecific
