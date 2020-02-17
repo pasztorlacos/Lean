@@ -500,7 +500,8 @@ class MySIMPosition():
         self.CL.rawClosedPositionsData.append(self.positionData)
         self.CL.simsClosed +=1
         self.isClosed = True
-        
+        self.symbolStrat.consolidator.DataConsolidated -= self.Update
+
         if self.CL.simsClosed % self.CL.debugFrequency == 0: self.algo.MyDebug(f' ------- Total Sims Closed: {self.CL.simsClosed}, Running Sims:{self.CL.simsOpened-self.CL.simsClosed}')
         return
     
