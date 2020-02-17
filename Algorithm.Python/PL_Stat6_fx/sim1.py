@@ -28,7 +28,7 @@ class MySIMPosition():
     hasPosition=False
     modeQuantconnect = False
     useHeader=True
-    subStatName="\\2015"
+    subStatName="\\2017-"
     statName = "Stat6_fx"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\QuantConnect\\Stats\\"+statName+"\\"
@@ -82,11 +82,12 @@ class MySIMPosition():
         return btTime
 
 
-    def __init__(self, symbolStrat, direction, timestamp, signal, features, simTradeTypes=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], simMinMaxTypes=[0,1,2,3]):
+    def __init__(self, symbolStrat, direction, timestamp, signal, features, simTradeTypes=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], simMinMaxTypes=[0,1,2,3], openUntil=datetime(2168, 6, 25, 15, 55)):
         self.CL = self.__class__
         self.symbolStrat = symbolStrat
         self.algo = self.symbolStrat.algo
         self.direction = direction
+        self.openUntil = openUntil
         self.entryPrice = self.algo.Portfolio.Securities[self.symbolStrat.symbol].Price
         self.positionData = []
         self.positionData.append(str(self.symbolStrat.symbol))
@@ -420,7 +421,7 @@ class MySIMPosition():
                 stopTrailer=None #None if no trail
                 targetPrice=None #This is overwritten if payOff!=0
                 minStopDistance = 2*self.symbolStrat.atr1.Current.Value
-                if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(tradeNo)+"_PPct", str(tradeNo)+"_PAtr", str(tradeNo)+"_PayOff"))
+                if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(tradeNo)+"_PPct", str(tradeNo)+"_PAtr", str(tradeNo)+"_PayOff", str(tradeNo)+"_Bars"))
                 if self.direction==1:
                     stopPrice=min(self.symbolStrat.dch2.LowerBand.Current.Value, self.entryPrice-minStopDistance)
                     if payOff!=0: targetPrice=self.entryPrice+payOff*(self.entryPrice-stopPrice)
@@ -440,7 +441,7 @@ class MySIMPosition():
                 stopTrailer=None #None if no trail
                 targetPrice=None #This is overwritten if payOff!=0
                 minStopDistance = 2*self.symbolStrat.atr1.Current.Value
-                if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(tradeNo)+"_PPct", str(tradeNo)+"_PAtr", str(tradeNo)+"_PayOff"))
+                if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(tradeNo)+"_PPct", str(tradeNo)+"_PAtr", str(tradeNo)+"_PayOff", str(tradeNo)+"_Bars"))
                 if self.direction==1:
                     stopPrice=min(self.symbolStrat.dch2.LowerBand.Current.Value, self.entryPrice-minStopDistance)
                     if payOff!=0: targetPrice=self.entryPrice+payOff*(self.entryPrice-stopPrice)
@@ -452,7 +453,7 @@ class MySIMPosition():
                     newTrade = MySIMTrade(self, len(self.positionData), self.entryPrice, \
                             stopPrice, targetPrice, scratchTrade, stopTrailer)
                 self.positionData.extend(singleTradeOutput)
-                tradeNo+=1 
+                tradeNo+=1  
                 
         '''Simulated Period MinMaxes and Price change
         '''
@@ -557,6 +558,14 @@ class MySIMTrade():
         #Check Target Order
         if self.targetOrder!=None and self.targetOrder.satus == OrderStatus.Submitted:
             self.targetOrder.Update(bar)    
+        
+        #Close if DayTrade and still open (stop is still submitted): cancel orders and close trade
+        if self.position.openUntil <= self.position.algo.Time and self.stopOrder.satus == OrderStatus.Submitted:
+            slippage = self.stopOrder.Slippage()
+            closePrice = bar.Close - slippage*self.direction
+            self.stopOrder.satus = OrderStatus.Canceled
+            if self.targetOrder!=None: self.targetOrder.satus = OrderStatus.Canceled
+            self.CloseTrade(closePrice)
         return
     
     def CloseTrade(self, closePrice):

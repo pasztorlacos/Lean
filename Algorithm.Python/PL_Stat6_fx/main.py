@@ -120,7 +120,7 @@ class MyAlgo(QCAlgorithm):
         #self.SetEndDate(2016,10,11) #Last PiData Date
         self.simYears = 3
         self.simEndDate = datetime(self.simStartYear+self.simYears, 1, 1, 0, 0) #Use None if not applicable
-        self.SetEndDate(min(self.simEndDate + timedelta(days=30), datetime(2019,10,11)))
+        self.SetEndDate(min(self.simEndDate + timedelta(days=30), datetime(2019,10,10)))
 
         #self.Portfolio.SetAccountCurrency("EUR")
         self.SetCash(100000)
