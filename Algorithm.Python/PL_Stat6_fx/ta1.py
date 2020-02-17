@@ -1305,7 +1305,7 @@ class MyVolatility():
         return volChange
         
     #FEATURE EXTRACTOR
-    def FeatureExtractor(self, Type=1, lookbacklist=[15,35,70,100]):
+    def FeatureExtractor(self, Type=1, lookbacklist=[15,35,70,100], avgPeriod=100):
         if Type==1:
             features = list(self.atrVolatility)
         elif Type==2:
@@ -1318,9 +1318,9 @@ class MyVolatility():
             #len=4+3*len(lookbacklist)
             features = []
             features.append(self.atrNormVolatility[0])
-            features.append(self.VolFromAverage(100))
+            features.append(self.VolFromAverage(avgPeriod))
             features.append(self.algo.mySymbolDict[self.benchmarkSymbol].vol.atrNormVolatility[0])
-            features.append(self.algo.mySymbolDict[self.benchmarkSymbol].vol.VolFromAverage(100))
+            features.append(self.algo.mySymbolDict[self.benchmarkSymbol].vol.VolFromAverage(avgPeriod))
             
             changes = []
             relativechanges = []
@@ -1336,7 +1336,7 @@ class MyVolatility():
         elif Type==51:
             features = []
             features.append(self.atrNormVolatility[0])
-            features.append(self.VolFromAverage(100))
+            features.append(self.VolFromAverage(avgPeriod))
             
             changes = []
             for lookback in lookbacklist:
