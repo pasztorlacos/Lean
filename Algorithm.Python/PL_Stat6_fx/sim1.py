@@ -541,12 +541,12 @@ class MySIMTrade():
         self.isClosed = False
         
         self.position.openTrades.append(self)
+        #Subscribes for DataConsolidated
         self.position.symbolStrat.consolidator.DataConsolidated += self.Update
         self.openBars = 0
         return
 
     def Update(self, caller, bar):
-        #Subscribes for symbolStrat.consolidator.DataConsolidated
         if self.isClosed:
             return
         self.openBars+=1 
@@ -582,6 +582,8 @@ class MySIMTrade():
 
         self.position.openTrades.remove(self)
         self.isClosed = True
+        #Unsubscribes for DataConsolidated
+        self.position.symbolStrat.consolidator.DataConsolidated -= self.Update
         return
     
     #COMMISSION MODEL
