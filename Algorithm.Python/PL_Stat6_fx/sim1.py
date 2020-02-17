@@ -500,7 +500,7 @@ class MySIMPosition():
         self.CL.simsClosed +=1
         self.isClosed = True
         
-        if self.CL.simsClosed % self.CL.debugFrequency == 0: self.algo.MyDebug(f' ------- Total Sims Closed: {self.CL.simsClosed}')
+        if self.CL.simsClosed % self.CL.debugFrequency == 0: self.algo.MyDebug(f' ------- Total Sims Closed: {self.CL.simsClosed}, Running Sims:{self.CL.simsOpened-self.CL.simsClosed}')
         return
     
     def Update(self, caller, bar):
