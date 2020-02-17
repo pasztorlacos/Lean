@@ -28,7 +28,7 @@ class MySIMPosition():
     hasPosition=False
     modeQuantconnect = False
     useHeader=True
-    subStatName="\\2015-"
+    subStatName="\\2015"
     statName = "Stat6_fx"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\QuantConnect\\Stats\\"+statName+"\\"

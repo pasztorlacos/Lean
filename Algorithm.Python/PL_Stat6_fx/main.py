@@ -105,7 +105,7 @@ class MyAlgo(QCAlgorithm):
         #self.SetStartDate(2019,6,1)
         #self.SetStartDate(datetime.now() - timedelta(days=30))  
         self.simStartYear=2015
-        self.SetStartDate(self.simYear,1,1)
+        self.SetStartDate(self.simStartYear,1,1)
 
         #End Date
         #self.SetEndDate(2003,6,30)
