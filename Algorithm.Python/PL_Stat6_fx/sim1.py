@@ -60,7 +60,7 @@ class MySIMPosition():
             shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + '_' + savefile[1] +'.py')
             
         #Save rawClosedPositionsData to csv file
-        statFile = cls.statFolder + statName + "_"+ datetime.now().strftime("%Y%m%d_%H_%M") + ".csv"
+        statFile = cls.statFolder + cls.subStatName + "_"+ datetime.now().strftime("%Y%m%d_%H_%M") + ".csv"
         if os.path.exists(statFile):
             os.remove(statFile)
         df = pd.DataFrame(cls.rawClosedPositionsData[1:], columns=cls.rawClosedPositionsData[0])
