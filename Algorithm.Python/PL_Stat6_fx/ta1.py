@@ -619,7 +619,7 @@ class MyZigZag():
                firstLow = self.zzPoints[0].trendCount < 0 
             else:
                firstLow = True
-               #self.algo.MyDebug(f'ZZ is empty when calulating firstLow. Symbol:{self.symbol}')
+               #self.algo.MyDebug(f' ZZ({self.name}) is empty when calulating firstLow. Symbol:{self.symbol}')
 
             #zzPoints[0] is the latest
             for i in range (0,min(listLen,len(self.zzPoints))):
