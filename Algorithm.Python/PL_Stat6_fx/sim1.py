@@ -31,7 +31,7 @@ class MySIMPosition():
     subStatName="\\2005-2009"
     statName = "Stat6_fx"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
-    statFolder="X:\\My Drive\\QuantConnect\\Stats\\"+statName+"\\"
+    statFolder="X:\\My Drive\\QCData\\Stats\\"+statName+"\\"
     saveFiles = [] #List of lists or tuples (filePath, fileName)
     simsOpened = 0
     simsClosed = 0
