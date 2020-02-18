@@ -28,7 +28,7 @@ class MySIMPosition():
     hasPosition=False
     modeQuantconnect = False
     useHeader=True
-    subStatName="\\2017-"
+    subStatName="\\2005-2009"
     statName = "Stat6_fx"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\QuantConnect\\Stats\\"+statName+"\\"
@@ -60,7 +60,7 @@ class MySIMPosition():
             shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + '_' + savefile[1] +'.py')
             
         #Save rawClosedPositionsData to csv file
-        statFile = cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + ".csv"
+        statFile = cls.statFolder + statName + "_"+ datetime.now().strftime("%Y%m%d_%H_%M") + ".csv"
         if os.path.exists(statFile):
             os.remove(statFile)
         df = pd.DataFrame(cls.rawClosedPositionsData[1:], columns=cls.rawClosedPositionsData[0])
@@ -500,13 +500,13 @@ class MySIMPosition():
         self.CL.rawClosedPositionsData.append(self.positionData)
         self.CL.simsClosed +=1
         self.isClosed = True
+        #Unsubscribes for DataConsolidated
         self.symbolStrat.consolidator.DataConsolidated -= self.Update
 
         if self.CL.simsClosed % self.CL.debugFrequency == 0: self.algo.MyDebug(f' ------- Total Sims Closed: {self.CL.simsClosed}, Running Sims:{self.CL.simsOpened-self.CL.simsClosed}')
         return
     
     def Update(self, caller, bar):
-        #Subscribes for symbolStrat.consolidator.DataConsolidated
         #If this was the last(both lists are empty) and it is not closed yet: close Positions
         if not self.isClosed and len(self.openTrades)==0 and len(self.openPriceMinMaxes)==0:
             self.ClosePosition()
