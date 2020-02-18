@@ -82,7 +82,7 @@ class MySIMPosition():
         return btTime
 
 
-    def __init__(self, symbolStrat, direction, timestamp, signal, features, simTradeTypes=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], simMinMaxTypes=[0,1,2,3], openUntil=datetime(2168, 6, 25, 15, 55)):
+    def __init__(self, symbolStrat, direction, timestamp, signal, features, simTradeTypes=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], simMinMaxTypes=[0,1,2,3], openUntil=datetime(2168, 6, 25, 15, 55), DataConsolidated=None):
         self.CL = self.__class__
         self.symbolStrat = symbolStrat
         self.algo = self.symbolStrat.algo
@@ -97,7 +97,9 @@ class MySIMPosition():
         #self.positionData.extend(features)
         self.openTrades = []
         self.openPriceMinMaxes = []
-        self.symbolStrat.consolidator.DataConsolidated += self.Update
+        #Link to the relevant timeframe
+        self.DataConsolidated = self.symbolStrat.consolidator.DataConsolidated if DataConsolidated==None else DataConsolidated
+        self.DataConsolidated += self.Update
         self.rawDataHeader = []
         self.isClosed = False
         self.CL.simsOpened +=1
@@ -501,7 +503,7 @@ class MySIMPosition():
         self.CL.simsClosed +=1
         self.isClosed = True
         #Unsubscribes for DataConsolidated
-        self.symbolStrat.consolidator.DataConsolidated -= self.Update
+        self.DataConsolidated -= self.Update
 
         if self.CL.simsClosed % self.CL.debugFrequency == 0: self.algo.MyDebug(f' ------- Total Sims Closed: {self.CL.simsClosed}, Running Sims:{self.CL.simsOpened-self.CL.simsClosed}')
         return
@@ -543,7 +545,7 @@ class MySIMTrade():
         
         self.position.openTrades.append(self)
         #Subscribes for DataConsolidated
-        self.position.symbolStrat.consolidator.DataConsolidated += self.Update
+        self.position.DataConsolidated += self.Update
         self.openBars = 0
         return
 
@@ -584,7 +586,7 @@ class MySIMTrade():
         self.position.openTrades.remove(self)
         self.isClosed = True
         #Unsubscribes for DataConsolidated
-        self.position.symbolStrat.consolidator.DataConsolidated -= self.Update
+        self.position.DataConsolidated -= self.Update
         return
     
     #COMMISSION MODEL
@@ -699,7 +701,7 @@ class MyPriceMinMax():
         self.isClosed= False
         
         self.position.openPriceMinMaxes.append(self)
-        self.position.symbolStrat.consolidator.DataConsolidated += self.Update
+        self.position.DataConsolidated += self.Update
         return
     
     def Update(self, caller, bar):
@@ -716,5 +718,6 @@ class MyPriceMinMax():
                 self.position.positionData[self.index+2] = (self.priceMax-self.entryPrice)/self.atr/self.normalizer
             self.position.openPriceMinMaxes.remove(self)
             self.isClosed = True
+            self.position.DataConsolidated -= self.Update
         self.currentPeriod+=1
         return
