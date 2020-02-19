@@ -114,7 +114,8 @@ class Fx2_1_pt_1():
     _lastUpdated = datetime(year = 1968, month = 6, day = 25)
   
     #PiData. Dont use EURCAD before 2008 and GBPJPY before 2004, otherwise start with 2003
-    myTickers = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "AUDJPY", "CHFJPY", "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "GBPCHF", "GBPJPY"]
+    #PiFx = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "AUDJPY", "CHFJPY", "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "GBPCHF", "GBPJPY"]
+    myTickers = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "AUDJPY", "CHFJPY", "EURAUD", "EURCHF", "EURGBP", "EURJPY", "GBPCHF"]
     #myTickers = ["EURUSD", "GBPUSD", "EURGBP"]
     #myTickers = ["EURUSD"]
     
