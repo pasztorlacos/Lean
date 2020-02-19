@@ -336,11 +336,11 @@ class Fx2_1_pt_1():
 
         '''Signals'''
         self.barStrength1 = MyBarStrength(self, self.algo, self.symbol, name='barStrength1', period=10, atr=self.atr1, lookbackLong=2, lookbackShort=2, \
-                priceActionMinATRLong=1.5, priceActionMaxATRLong=2.5, priceActionMinATRShort=1.5, priceActionMaxATRShort=2.5, referenceTypeLong='Close', referenceTypeShort='Close')
+                priceActionMinATRLong=2.0, priceActionMaxATRLong=3.0, priceActionMinATRShort=2.0, priceActionMaxATRShort=3.0, referenceTypeLong='Close', referenceTypeShort='Close')
         self.algo.RegisterIndicator(self.symbol, self.barStrength1, self.consolidator)
         
         self.barRejection1 = MyBarRejection(self, self.algo, self.symbol, name='barRejection1', period=10, atr=self.atr1, lookbackLong=3, lookbackShort=3, \
-               rejectionPriceTravelLong=1.75, rejectionPriceTravelShort=1.75, rejectionPriceRangeLong=0.75, rejectionPriceRangeShort=0.75, referenceTypeLong='Close', referenceTypeShort='Close')
+               rejectionPriceTravelLong=1.25, rejectionPriceTravelShort=1.25, rejectionPriceRangeLong=0.30, rejectionPriceRangeShort=0.30, referenceTypeLong='Close', referenceTypeShort='Close')
         self.algo.RegisterIndicator(self.symbol, self.barRejection1, self.consolidator)
         
         '''Signals and Events string'''
