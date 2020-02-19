@@ -114,7 +114,7 @@ class Fx2_1_pt_1():
     _lastUpdated = datetime(year = 1968, month = 6, day = 25)
   
     #PiData. Dont use EURCAD before 2008 and GBPJPY before 2004, otherwise start with 2003
-    myTickers = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "AUDJPY", "CHFJPY", "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "GBPCHF", "GBPJPY"]
+    myTickers = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD", "AUDJPY", "CHFJPY", "EURAUD", "EURCHF", "EURGBP", "EURJPY", "GBPCHF", "GBPJPY"]
     #myTickers = ["EURUSD", "GBPUSD", "EURGBP"]
     #myTickers = ["EURUSD"]
     
@@ -125,11 +125,11 @@ class Fx2_1_pt_1():
 
     #Simulation Signals [direction, disableBars, Enabled]
     simDict = {
-       "L_Str_": [1,8,True], "S_Str_": [1,8,True], 
-       "L_Rej_": [-1,8,True], "S_Rej_": [-1,8,True],
-       "DB_": [-1,8,True], "DT_": [-1,8,True], 
-       "TB_": [-1,8,False], "TT_": [-1,8,False],
-       "HS_": [-1,8,False], "IHS_": [-1,8,False]}
+       "L_Str_": [1,8,True], "S_Str_": [-1,8,True], 
+       "L_Rej_": [1,8,True], "S_Rej_": [-1,8,True],
+       "DB_": [1,8,True], "DT_": [-1,8,True], 
+       "TB_": [1,8,False], "TT_": [-1,8,False],
+       "IHS_": [1,8,False], "HS_": [-1,8,False]}
     
     #AI ----
     loadAI = True

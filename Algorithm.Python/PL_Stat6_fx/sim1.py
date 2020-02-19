@@ -28,7 +28,7 @@ class MySIMPosition():
     hasPosition=False
     modeQuantconnect = False
     useHeader=True
-    subStatName="\\2015-"
+    subStatName="\\2005-2009"
     statName = "Stat6_1_fx"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\QCData\\Stats\\"+statName+"\\"
