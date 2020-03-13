@@ -1208,8 +1208,8 @@ class MyVolatility():
         self.atr = atr
         self.benchmarkTicker = benchmarkTicker
         self.benchmarkSymbol = None #During Initialize self.algo.Securities[self.benchmarkTicker].Symbol might not be available (initialized later)
-        benchmarkVolAttr = benchmarkVolAttr
-        benchmarkVol = None
+        self.benchmarkVolAttr = benchmarkVolAttr
+        self.benchmarkVol = None
         self.Time = datetime.min
         self.atrVolatility = deque(maxlen=period)
         self.atrNormVolatility = deque(maxlen=period)
@@ -1228,13 +1228,14 @@ class MyVolatility():
     
     # Update method is mandatory!
     def Update(self, bar):
-        #First Set up benchmarkSymbol and benchmarkVol. During init benchmarksymbol is not added yet. 
-        if self.benchmarkSymbol == None:
+        #First Set up benchmarkSymbol and benchmarkVol. During init benchmarksymbol is not added yet, so it has to be done at the forst update. 
+        if self.benchmarkSymbol==None:
             self.benchmarkSymbol = self.algo.benchmarkSymbol if self.benchmarkTicker==None else self.algo.Securities[self.benchmarkTicker].Symbol
         if self.benchmarkVol==None:
             if self.benchmarkVolAttr!=None and hasattr(self.algo.mySymbolDict[self.benchmarkSymbol], self.benchmarkVolAttr):
                 self.benchmarkVol = getattr(self.algo.mySymbolDict[self.benchmarkSymbol], self.benchmarkVolAttr)
-
+            else:
+                self.benchmarkVol = self.algo.mySymbolDict[self.benchmarkSymbol].vol
 
         normMultiplier = 1
         self.Time = bar.EndTime
@@ -1247,12 +1248,11 @@ class MyVolatility():
             self.atrNormVolatility.appendleft(log(1+self.Value*normMultiplier,10))
         else:
             self.atrNormVolatility.appendleft(0)
-        
-        
-        if len(self.algo.mySymbolDict[self.benchmarkSymbol].vol.atrVolatility)!=0:
+                
+        if len(self.benchmarkVol.atrVolatility)!=0:
             #if first bar in warmup and benchmark update comes after the symbol (this would result in benchmark data 1bar delay)
-            self.benchmark_atrVolatility=self.algo.mySymbolDict[self.benchmarkSymbol].vol.atrVolatility[0]
-            self.benchmark_atrNormVolatility=self.algo.mySymbolDict[self.benchmarkSymbol].vol.atrNormVolatility[0]
+            self.benchmark_atrVolatility = self.benchmarkVol.atrVolatility[0]
+            self.benchmark_atrNormVolatility = self.benchmarkVol.atrNormVolatility[0]
         else:
             self.benchmark_atrVolatility = 0.5
             self.benchmark_atrNormVolatility = log(1.5,10)
@@ -1329,13 +1329,11 @@ class MyVolatility():
         elif Type==4:
             features = [self.atrNormVolatility[0], self.atrNormVolatility[-1]]
         elif Type==5:
-            #len=4+3*len(lookbacklist)
             features = []
             features.append(self.atrNormVolatility[0])
-            #self.algo.MyDebug(f' ***************** {self.symbol} len(self.atrNormVolatility): {len(self.atrNormVolatility)}') 
             features.append(self.VolFromAverage(avgPeriod))
-            features.append(self.algo.mySymbolDict[self.benchmarkSymbol].vol.atrNormVolatility[0])
-            features.append(self.algo.mySymbolDict[self.benchmarkSymbol].vol.VolFromAverage(avgPeriod))
+            features.append(self.benchmarkVol.atrNormVolatility[0])
+            features.append(self.benchmarkVol.VolFromAverage(avgPeriod))
             
             changes = []
             relativechanges = []
@@ -1344,7 +1342,7 @@ class MyVolatility():
                 #Norm Volatility Change
                 changes.append(self.VolChange(lookback))
                 relativechanges.append(self.VolChange(lookback, relative=True))
-                changesBenchmark.append(self.algo.mySymbolDict[self.benchmarkSymbol].vol.VolChange(lookback))
+                changesBenchmark.append(self.benchmarkVol.VolChange(lookback))
             features.extend(changes)
             features.extend(relativechanges)
             features.extend(changesBenchmark)
