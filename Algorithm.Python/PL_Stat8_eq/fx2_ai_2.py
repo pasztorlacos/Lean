@@ -47,7 +47,7 @@ class Fx2_ai_2():
     barPeriod   =  timedelta(minutes=resolutionMinutes)
     barPeriod_2 =  timedelta(minutes=resolutionMinutes_2)
     if isEquity:
-        warmupcalendardays = max(round(7/5*maxWarmUpPeriod/(7*(60/resolutionMinutes))), round(7/5*maxWarmUpPeriod_2/(7*(60/resolutionMinutes_2))))
+        warmupcalendardays = max( round(7/5*maxWarmUpPeriod/(7*(60/min(resolutionMinutes,60*7) ))), round(7/5*maxWarmUpPeriod_2/(7*(60/min(resolutionMinutes_2,60*7) ))) )
     else:
         warmupcalendardays = max(round(7/5*maxWarmUpPeriod/(24*(60/resolutionMinutes))), round(7/5*maxWarmUpPeriod_2/(24*(60/resolutionMinutes_2))))
     #Switches
@@ -141,7 +141,7 @@ class Fx2_ai_2():
        "S_Rej_": 0}
     
     #AI ----
-    loadAI = True
+    loadAI = False
     aiDict = {}
     
     aiDict["L_Str_DCHs"] = {
