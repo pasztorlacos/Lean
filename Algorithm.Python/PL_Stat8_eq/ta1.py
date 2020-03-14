@@ -1228,7 +1228,7 @@ class MyVolatility():
     
     # Update method is mandatory!
     def Update(self, bar):
-        #First Set up benchmarkSymbol and benchmarkVol. During init benchmarksymbol is not added yet, so it has to be done at the forst update. 
+        #First Update: Set up benchmarkSymbol and benchmarkVol. During init benchmarksymbol is not added yet, so it has to be done at the forst update. 
         if self.benchmarkSymbol==None:
             self.benchmarkSymbol = self.algo.benchmarkSymbol if self.benchmarkTicker==None else self.algo.Securities[self.benchmarkTicker].Symbol
         if self.benchmarkVol==None:

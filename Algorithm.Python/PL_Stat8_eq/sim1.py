@@ -28,7 +28,7 @@ class MySIMPosition():
     hasPosition=False
     modeQuantconnect = False
     useHeader=True
-    subStatName="\\SLICE_1"    #SLICE_1 | TEST  
+    subStatName="\\SLICE_8"    #SLICE_1 | TEST  
     statName = "Stat8_eq"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\\QCData\\Stats\\"+statName+"\\"
