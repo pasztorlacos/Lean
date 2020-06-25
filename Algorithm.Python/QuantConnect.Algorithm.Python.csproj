@@ -89,8 +89,16 @@
     <Content Include="CustomDataUsingMapFileRegressionAlgorithm.py" />
     <Content Include="LiquidETFUniverseFrameworkAlgorithm.py" />
     <None Include="PL_Stat5\BasicTemplateAlgorithm.py" />
-    <Content Include="PL_Stat8_eq\eq2_ai_2.py" />
-    <Content Include="PL_Stat8_eq\fx2_ai_2.py" />
+    <Content Include="PL_Stat10_eq\eq2_ai_4.py" />
+    <Content Include="PL_Stat10_eq\hp3.py" />
+    <Content Include="PL_Stat10_eq\main.py" />
+    <Content Include="PL_Stat10_eq\pm3.py" />
+    <Content Include="PL_Stat10_eq\pmB3.py" />
+    <Content Include="PL_Stat10_eq\sim1.py" />
+    <Content Include="PL_Stat10_eq\ta1.py" />
+    <Content Include="PL_Stat10_eq\taB1.py" />
+    <Content Include="PL_Stat10_eq\var31.py" />
+    <Content Include="PL_Stat8_eq\eq2_ai_3.py" />
     <Content Include="PL_Stat8_eq\hp3.py" />
     <Content Include="PL_Stat8_eq\main.py" />
     <Content Include="PL_Stat8_eq\pm3.py" />
@@ -303,6 +311,7 @@
       <HintPath>..\packages\StringInterpolationBridgeStrong.0.9.1\lib\net40\StringInterpolationBridge.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <IsWindows>false</IsWindows>
     <IsWindows Condition="'$(OS)' == 'Windows_NT'">true</IsWindows>
