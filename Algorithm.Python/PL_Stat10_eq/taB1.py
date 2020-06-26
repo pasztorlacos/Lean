@@ -378,7 +378,8 @@ class MyGASF():
         
         if len(x.shape) == 1:
             #Single vector
-            x_t = GASF(x)
+            #add 1 extra dim as cnn needs channels even if it is 1
+            x_t = np.expand_dims(GASF(x), axis=0)
         else:
             #n=x.shape[0] channel matrix
             x_t = np.zeros(x.shape[0]*x.shape[1]*x.shape[1], dtype=np.float64).reshape(x.shape[0], x.shape[1], x.shape[1])

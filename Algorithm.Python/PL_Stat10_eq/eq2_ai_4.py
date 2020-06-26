@@ -21,6 +21,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import random
+
 class Eq2_ai_4():
     file = __file__
     '''
@@ -299,7 +301,7 @@ class Eq2_ai_4():
         
         #Initialize signalDisabledBarsSim 
         self.signalDisabledBarsSim = {}
-        i = 0
+        i = random.randint(0, 7)
         for simKey, simObj in self.CL.simDict.items():
             self.signalDisabledBarsSim[simKey] = i
             i += 1
