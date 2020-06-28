@@ -29,7 +29,7 @@ class MySIMPosition():
     hasPosition=False
     useHeader=True
     subStatName="\\Test"
-    statName = "Stat10_eq"+subStatName
+    statName = "Stat10"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\\QCStats\\"+statName+"\\" #Mooved from "X:\\My Drive\\\QCData\\Stats\\"+statName+"\\"
     saveFiles = [] #List of lists or tuples (filePath, fileName)

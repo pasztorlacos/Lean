@@ -101,7 +101,7 @@ class MyAlgo(QCAlgorithm):
         #self.SetStartDate(2018,1,1)
         #self.SetStartDate(2019,1,1)
         #self.SetStartDate(datetime.now() - timedelta(days=30))  
-        self.simStartYear=2019
+        self.simStartYear=2010
         self.SetStartDate(self.simStartYear,1,1)
 
         #End Date
@@ -130,7 +130,7 @@ class MyAlgo(QCAlgorithm):
         self.SetWarmUp(self.myHelpers.WarUpDays()) 
         
         #Add chartSymbol and Set Tradable Property!
-        self.chartTicker = "QQQ" #"QQQ"
+        self.chartTicker = "DIA" #"QQQ"
         self.AddEquity(self.chartTicker, self.mainResolution)
         self.chartSymbol = self.Securities[self.chartTicker].Symbol 
         self.Securities[self.chartSymbol].SetDataNormalizationMode(self.myDataNormalizationMode)
