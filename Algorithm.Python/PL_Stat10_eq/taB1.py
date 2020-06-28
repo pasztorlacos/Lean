@@ -10,7 +10,7 @@ from QuantConnect.Data.Market import TradeBar
 import numpy as np
 from datetime import datetime, timedelta
 from collections import deque
-from math import log
+from math import log, cos
 import pickle
 import codecs
 
@@ -363,9 +363,10 @@ class MyGASF():
     # assumes x as normalized multidimensional (channels are in rows) numpy either as it is or pickled
     #   pickle:     x = codecs.encode(pickle.dumps(x, protocol= pickle.HIGHEST_PROTOCOL), "base64").decode()
     #   unpickle:   x = pickle.loads(codecs.decode(x.encode(), "base64"))
-    def GASF_Transform (self, x, unPickle=False, positiveNormalize=True):
+    def GASF_Transform (self, x, unPickle=False, unPickleOnly=False, positiveNormalize=True):
         if unPickle: x = pickle.loads(codecs.decode(x.encode(), "base64"))
-        
+        if unPickleOnly: return x
+
         #Transformation Function
         def GASF(x_v):
             n = len(x_v)

@@ -243,7 +243,7 @@ class Eq2_ai_4():
         self.vol = MyVolatility(self, self.algo, self.symbol, name='vol', period=200, atr=self.atr1)
         self.algo.RegisterIndicator(self.symbol, self.vol, self.consolidator)
         
-        self.gasf1 = MyGASF(self, self.algo, self.symbol, name='gasf1', period=10, atr=self.atr1, benchmarkTicker=None)
+        self.gasf1 = MyGASF(self, self.algo, self.symbol, name='gasf1', period=40, atr=self.atr1, benchmarkTicker=None)
         self.algo.RegisterIndicator(self.symbol, self.gasf1, self.consolidator)
 
         '''Indicators Higher Timeframe'''
@@ -252,7 +252,7 @@ class Eq2_ai_4():
         self.dch2_2 = DonchianChannel(100)
         self.algo.RegisterIndicator(self.symbol, self.dch2_2, self.consolidator_2)
 
-        self.gasf1_2 = MyGASF(self, self.algo, self.symbol, name='gasf1_2', period=10, atr=self.atr1_2, benchmarkTicker=None)
+        self.gasf1_2 = MyGASF(self, self.algo, self.symbol, name='gasf1_2', period=40, atr=self.atr1_2, benchmarkTicker=None)
         self.algo.RegisterIndicator(self.symbol, self.gasf1_2, self.consolidator)
 
         '''Symbol State and Features'''
@@ -389,13 +389,13 @@ class Eq2_ai_4():
         '''
         #Simulation should use this feature
         if loadFeatures1 or (longTriggerSim or shortTriggerSim):
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=False, picleFeatures=True), \
-                                self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=False, picleFeatures=True), \
-                                self.gasf1.FeatureExtractor(featureType="Volume", useGASF=False, picleFeatures=True), \
-                                self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=False, picleFeatures=True)]
+            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=True, picleFeatures=True), \
+                                self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=True, picleFeatures=True), \
+                                self.gasf1.FeatureExtractor(featureType="Volume", useGASF=True, picleFeatures=True), \
+                                self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=True, picleFeatures=True)]
         
         if loadFeatures2:
-            self.rawFeatures2 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=True, picleFeatures=False), \
+            self.rawFeatures2 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGASF=True, picleFeatures=False), \
                                 self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=True, picleFeatures=False), \
                                 self.gasf1.FeatureExtractor(featureType="Volume", useGASF=True, picleFeatures=False), \
                                 self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=True, picleFeatures=False)]
