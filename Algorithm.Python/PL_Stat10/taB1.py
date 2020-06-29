@@ -363,8 +363,9 @@ class MyGASF():
     # assumes x as normalized multidimensional (channels are in rows) numpy either as it is or pickled
     #   pickle:     x = codecs.encode(pickle.dumps(x, protocol= pickle.HIGHEST_PROTOCOL), "base64").decode()
     #   unpickle:   x = pickle.loads(codecs.decode(x.encode(), "base64"))
-    def GASF_Transform (self, x, unPickle=False, unPickleOnly=False, positiveNormalize=True):
+    def GASF_Transform (self, x, unPickle=False, intDecode=None, unPickleOnly=False, positiveNormalize=True):
         if unPickle: x = pickle.loads(codecs.decode(x.encode(), "base64"))
+        if intDecode!=None: x = self.IntCoding(x, intDecode, encode=False)
         if unPickleOnly: return x
 
         #Transformation Function
@@ -394,10 +395,28 @@ class MyGASF():
         _min = np.min(x)
         _delta = _max - _min if _max!=_min else 1
         return (x-_min)/_delta
+
+    # INTEGER CODING
+    # It assumes Numpy array normalised between [0.0, 1.0]
+    # Encodes data between [-128, 128] etc..
+    def IntCoding(self, x, encodeType=np.int16, decodeType=np.single, encode=True):
+        intNorm = {
+            np.int8:  128,
+            np.int16: 32767}
+    
+        if encode:
+            x_enc = x * 2*intNorm[encodeType]-intNorm[encodeType]
+            x_enc = x_enc.astype(encodeType)
+            return x_enc
+        else:
+            x = x.astype(decodeType)
+            x_dec = (x + intNorm[encodeType])/(2*intNorm[encodeType])
+            x_dec = x_dec.astype(decodeType)
+            return x_dec
         
     #FEATURE EXTRACTOR
     #   For Simulation Stats use useGASF=False, picleFeatures=True
-    def FeatureExtractor(self, featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=True, picleFeatures=False):
+    def FeatureExtractor(self, featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=False, intCode=None):
         
         if featureType == "PriceBars":
             #Close, Upper shadow, Lower shadow, Body, Gap
@@ -430,7 +449,9 @@ class MyGASF():
         elif featureType == "Volatility":
             Features = self.Norm(np.array(self.volatility))
         
-        if useGASF: Features = self.GASF_Transform(Features, unPickle=False, positiveNormalize=True)
+        if useGASF: Features = self.GASF_Transform(Features, positiveNormalize=True)
+        if useFloat32: Features = Features.astype(np.single)
+        if intCode!=None: Features = self.IntCoding(Features, encodeType=intCode)
         if picleFeatures: Features = codecs.encode(pickle.dumps(Features, protocol= pickle.HIGHEST_PROTOCOL), "base64").decode()
         
         return Features

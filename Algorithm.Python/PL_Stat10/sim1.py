@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta, date
 import os
+from sys import getsizeof as getsizeof
 
 import shutil
 
@@ -28,13 +29,14 @@ class MySIMPosition():
     useSingleFeatureList=False
     hasPosition=False
     useHeader=True
-    subStatName="\\Test"
+    subStatName="\\Test-100x100_1ch_GASF"
     statName = "Stat10"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\\QCStats\\"+statName+"\\" #Mooved from "X:\\My Drive\\\QCData\\Stats\\"+statName+"\\"
     saveFiles = [] #List of lists or tuples (filePath, fileName)
     simsOpened = 0
     simsClosed = 0
+    codefilesSaved = False
     
     @classmethod
     def SaveData(cls, algo):
@@ -55,14 +57,17 @@ class MySIMPosition():
             os.makedirs(cls.statFolder)
               
         #Save Files
-        for savefile in cls.saveFiles:
-            shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + '_' + savefile[1] +'.py')
+        if not cls.codefilesSaved:
+            for savefile in cls.saveFiles:
+                shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + '_' + savefile[1] +'.py')
+            cls.codefilesSaved = True
             
         #Save rawClosedPositionsData to csv file
         statFile = cls.statFolder + cls.subStatName + "_"+ datetime.now().strftime("%Y%m%d_%H_%M") + ".csv"
         if os.path.exists(statFile):
             os.remove(statFile)
         df = pd.DataFrame(cls.rawClosedPositionsData[1:], columns=cls.rawClosedPositionsData[0])
+        algo.MyDebug(f'    Saving data to {statFile}\n    {getsizeof(df)/10**6} MB')
         df = df.sort_values(by=["TimeStamp"])
         df.insert(loc=3, column='TimeConverted', value=datetime.now())
         for i in range(0, df.shape[0]):
