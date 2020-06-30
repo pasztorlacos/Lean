@@ -401,16 +401,25 @@ class MyGASF():
     # Encodes data between [-128, 128] etc..
     def IntCoding(self, x, encodeType=np.int16, decodeType=np.single, encode=True):
         intNorm = {
-            np.int8:  128,
-            np.int16: 32767}
-    
+            np.int8:   128,
+            np.int16:  32767,
+            np.int32:  2147483647,
+            np.uint8:  255,
+            np.uint16: 65535,
+            np.uint32: 4294967295}
         if encode:
-            x_enc = x * 2*intNorm[encodeType]-intNorm[encodeType]
+            if encodeType==np.int8 or encodeType==np.int16 or encodeType==np.int32:
+                x_enc = x * 2*intNorm[encodeType]-intNorm[encodeType]
+            else:
+                x_enc = np.round(x * intNorm[encodeType])
             x_enc = x_enc.astype(encodeType)
             return x_enc
         else:
             x = x.astype(decodeType)
-            x_dec = (x + intNorm[encodeType])/(2*intNorm[encodeType])
+            if encodeType==np.int8 or encodeType==np.int16 or encodeType==np.int32:
+                x_dec = (x + intNorm[encodeType])/(2*intNorm[encodeType])
+            else:
+                x_dec = x /  intNorm[encodeType]
             x_dec = x_dec.astype(decodeType)
             return x_dec
         
@@ -449,6 +458,8 @@ class MyGASF():
         elif featureType == "Volatility":
             Features = self.Norm(np.array(self.volatility))
         
+        #in case of vectors (time series only) one extra dim as channel=1 added during gasf so output also is in (1, ch, n, n) format
+        #   if no gasf is used only pickled, numpy time series as vectors or OHLC stacked to matrix is pickled
         if useGASF: Features = self.GASF_Transform(Features, positiveNormalize=True)
         if useFloat32: Features = Features.astype(np.single)
         if intCode!=None: Features = self.IntCoding(Features, encodeType=intCode)

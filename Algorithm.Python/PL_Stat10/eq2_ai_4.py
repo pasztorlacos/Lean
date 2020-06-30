@@ -120,7 +120,7 @@ class Eq2_ai_4():
     #Lean noETFs SLICE_n (41)
     #myTickers = ["TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA", "ZS", "ZUO"]
     myTickers =["A", "AMZN"]
-    #myTickers =["A"]
+    #myTickers =["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG"]
 
     #ES&NQ (181)
     #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DHR", "DIS", "DOW", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM", "ATVI", "AMD", "ALXN", "ALGN", "AAL", "ADI", "AMAT", "ASML", "ADSK", "ADP", "BIDU", "BMRN", "AVGO", "CDNS", "CERN", "CHKP", "CTAS", "CTXS", "CTSH", "CSX", "CTRP", "DLTR", "EBAY", "EA", "EXPE", "FAST", "FISV", "FOX", "FOXA", "HAS", "HSIC", "IDXX", "ILMN", "INCY", "INTU", "ISRG", "JBHT", "JD", "KLAC", "LRCX", "LBTYA", "LBTYK", "LULU", "MAR", "MXIM", "MELI", "MCHP", "MU", "MNST", "MYL", "NTAP", "NTES", "NXPI", "ORLY", "PCAR", "PAYX", "REGN", "ROST", "SIRI", "SWKS", "SYMC", "SNPS", "TMUS", "TTWO", "TSLA", "ULTA", "UAL", "VRSN", "VRSK", "VRTX", "WDAY", "WDC", "WLTW", "WYNN", "XEL", "XLNX", "STX", "TSLA", "VRSK", "WYNN", "XLNX"]
@@ -153,7 +153,7 @@ class Eq2_ai_4():
     
  #Simulation Signals [direction, disableBars, Enabled]
     simDict = {
-       "ALL_L": [1,4,True], "ALL_S": [-1,4,True],
+       "ALL_L": [1,8,True], "ALL_S": [-1,8,True],
        "L_Str_": [1,8,False], "S_Str_": [-1,8,False], 
        "L_Rej_": [1,8,False], "S_Rej_": [-1,8,False],
        "DB_": [1,8,False], "DT_": [-1,8,False], 
@@ -253,7 +253,7 @@ class Eq2_ai_4():
         self.dch2_2 = DonchianChannel(100)
         self.algo.RegisterIndicator(self.symbol, self.dch2_2, self.consolidator_2)
 
-        self.gasf1_2 = MyGASF(self, self.algo, self.symbol, name='gasf1_2', period=100, atr=self.atr1_2, benchmarkTicker=None)
+        self.gasf1_2 = MyGASF(self, self.algo, self.symbol, name='gasf1_2', period=50, atr=self.atr1_2, benchmarkTicker=None)
         self.algo.RegisterIndicator(self.symbol, self.gasf1_2, self.consolidator)
 
         '''Symbol State and Features'''
@@ -389,13 +389,16 @@ class Eq2_ai_4():
         '''FEATURES
         '''
         #Simulation should use this feature
-        gasfSim = True
+        gasfSim = False
+        intCode = [None, np.uint8, np.uint16][1] 
         if loadFeatures1 or (longTriggerSim or shortTriggerSim):
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=gasfSim, picleFeatures=True), \
-                                self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True), \
-                                self.gasf1.FeatureExtractor(featureType="Volume", useGASF=gasfSim, picleFeatures=True), \
-                                self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=gasfSim, picleFeatures=True)]
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="RelativePrice", barType="CULBG", useGASF=gasfSim, picleFeatures=True, useFloat32=True, intCode=np.int8)]
+            #self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=gasfSim, picleFeatures=True, intCode=intCode), \
+            #                    self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
+            #                    self.gasf1.FeatureExtractor(featureType="Volume", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
+            #                    self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=gasfSim, picleFeatures=True, intCode=intCode)]
+            #self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="RelativePrice", barType="CULBG", useGASF=gasfSim, picleFeatures=True, useFloat32=True, intCode=intCode)]
+            self.rawFeatures1 = [[1,2,3], self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGASF=gasfSim, picleFeatures=True, useFloat32=True, intCode=intCode), \
+                                self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=gasfSim, picleFeatures=True, useFloat32=True, intCode=intCode), [4, 5]]
         
         if loadFeatures2:
             self.rawFeatures2 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGASF=True, picleFeatures=False), \

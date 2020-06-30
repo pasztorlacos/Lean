@@ -26,10 +26,9 @@ class MySIMPosition():
     modeQuantconnect = False
     debugFrequency = 1000
     rawClosedPositionsData = [] #list of completed positionData lists
-    useSingleFeatureList=False
     hasPosition=False
     useHeader=True
-    subStatName="\\Test-100x100_1ch_GASF"
+    subStatName="\\Test-Coding_No-GASF"
     statName = "Stat10"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\\QCStats\\"+statName+"\\" #Mooved from "X:\\My Drive\\\QCData\\Stats\\"+statName+"\\"
@@ -112,25 +111,25 @@ class MySIMPosition():
         #If this is the first instance Initialize rawDataHeader
         if not self.CL.hasPosition: 
             self.rawDataHeader.extend(("Symbol","Direction","TimeStamp","Signal"))
-            if isinstance(features[0], list) and not self.CL.useSingleFeatureList:
-                #if features is a list of lists
-                for i in range(0, len(features)):
+            #Fatures Header
+            for i in range(0, len(features)):
+                if isinstance(features[i], list):
+                    #features i is a list
                     for j in range(0, len(features[i])):
                         self.rawDataHeader.append("Feat"+str(i)+'_'+str(j))
-            else:
-                #if features is a single list or useSingleFeatureList
-                for i in range(len(features)):
+                else:
+                    #features i is a single number 
                     self.rawDataHeader.append("Feat"+str(i))
 
         #Fill in Features
-        if isinstance(features[0], list) and not self.CL.useSingleFeatureList:
-            #if features is a list of lists
-            for i in range(0, len(features)):
+        for i in range(0, len(features)):
+            if isinstance(features[i], list):
+                ##features i is a list, extend unpacs the list
                 self.positionData.extend(features[i])
-        else:
-            #if features is a single list
-            self.positionData.extend(features)
-            
+            else:
+                #features i is a single number
+                self.positionData.append(features[i])
+
         '''Simulated Trades
         '''
         #simTradeTypes=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
