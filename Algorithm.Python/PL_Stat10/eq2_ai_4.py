@@ -418,8 +418,8 @@ class Eq2_ai_4():
         #Simulation should use this feature
         gasfSim = True
         intCode = [None, np.uint8, np.uint16][1] 
-        preProcessTest = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preproDict ["CNNAE_1"]["model"])
-        self.algo.MyDebug(f'{preProcessTest.shape}')
+        preProcessedFeature1 = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preproDict["CNNAE_1"]["model"])
+        self.algo.MyDebug(f'preProcessedFeature1: {preProcessedFeature1.shape}')
         if loadFeatures1 or (longTriggerSim or shortTriggerSim):
             #self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
