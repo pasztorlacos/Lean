@@ -28,7 +28,7 @@ class MySIMPosition():
     rawClosedPositionsData = [] #list of completed positionData lists
     hasPosition=False
     useHeader=True
-    subStatName="\\Test-Coding_No-GASF"
+    subStatName="\\Test-CNN_AE"
     statName = "Stat10"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\\QCStats\\"+statName+"\\" #Mooved from "X:\\My Drive\\\QCData\\Stats\\"+statName+"\\"
@@ -124,7 +124,7 @@ class MySIMPosition():
         #Fill in Features
         for i in range(0, len(features)):
             if isinstance(features[i], list):
-                ##features i is a list, extend unpacs the list
+                ##features i is a list, extend unpacks the list
                 self.positionData.extend(features[i])
             else:
                 #features i is a single number

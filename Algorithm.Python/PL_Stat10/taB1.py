@@ -436,9 +436,10 @@ class MyGASF():
                 _L = self.Norm(np.array([bar.Open-bar.Low if bar.Close>bar.Open else bar.Close-bar.Low for bar in self.myBars]))
                 _B = self.Norm(np.array([bar.Close-bar.Open for bar in self.myBars]))
                 _C_n_t1 = np.roll(_C_n, shift=-1, axis = 0) 
-                _C_n_t1[len(_C_n_t1)-1] = 0
+                #_C_n_t1[len(_C_n_t1)-1] = 0 #this is no good as creates a huge gap at [len-1]
+                _C_n_t1[len(_C_n_t1)-1] = _C_n_t1[max(len(_C_n_t1)-2,0)] #this creates a 0 gap at [len-1] so no need for clear it
                 _G = np.array([bar.Open for bar in self.myBars])-_C_n_t1
-                _G[len(_G)-1] = 0
+                #_G[len(_G)-1] = 0
                 _G = self.Norm(_G)
                 Features = np.vstack((_C, _U, _L, _B, _G)) if useGAP else np.vstack((_C, _U, _L, _B))
             #OHLC
@@ -449,6 +450,24 @@ class MyGASF():
                 _C = self.Norm(np.array([bar.Close for bar in self.myBars]))
                 Features = np.vstack((_O, _H, _L, _C))
         
+        elif featureType == "Close":
+            _C_n = np.array([bar.Close for bar in self.myBars])
+            Features = self.Norm(_C_n)
+        
+        elif featureType == "ULRange":
+            _UR = self.Norm(np.array([bar.High-bar.Close for bar in self.myBars]))
+            _LR = self.Norm(np.array([bar.Close-bar.Low for bar in self.myBars]))
+            Features = np.vstack((_UR, _LR))
+
+        elif featureType == "ULRG":
+            _UR = self.Norm(np.array([bar.High-bar.Close for bar in self.myBars]))
+            _LR = self.Norm(np.array([bar.Close-bar.Low for bar in self.myBars]))
+            _C_n = np.array([bar.Close for bar in self.myBars])
+            _C_n_t1 = np.roll(_C_n, shift=-1, axis = 0) 
+            _C_n_t1[len(_C_n_t1)-1] = _C_n_t1[max(len(_C_n_t1)-2,0)] #this creates a 0 gap at [len-1]
+            _G = self.Norm(np.array([bar.Open for bar in self.myBars])-_C_n_t1)
+            Features = np.vstack((_UR, _LR, _G))
+
         elif featureType == "RelativePrice":
             Features = self.Norm(np.array(self.relativeClose))
         
