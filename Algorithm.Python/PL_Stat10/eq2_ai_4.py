@@ -31,7 +31,7 @@ class Eq2_ai_4():
     '''STRATEGY SETTINGS'''
     enabled = True
     manageOrderConsistency = True
-    simulate = True
+    simulate = False
     saveFilesFramework = True
     saveFilesSim = saveFilesFramework
     strategyCodeOriginal = __name__
@@ -119,8 +119,8 @@ class Eq2_ai_4():
     #myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ", "BKNG", "BLK", "BOX", "BP", "BRK-B", "BSX", "BTU", "BURL", "BX", "BYND", "C", "CAKE", "CARS", "CBOE", "CCJ", "CDLX", "CELG", "CHK", "CHWY", "CIEN", "CLDR", "CLF", "CLNE", "CMCSA", "CME", "CMG", "CMI", "CNDT", "COP", "COST", "COUP", "CPB", "CREE", "CRM", "CRSP", "CRUS", "CRWD", "CSX", "CTRP", "CTSH", "CVS", "DBI", "DBX", "DD", "DE", "DECK", "DELL", "DG", "DKS", "DLTR", "DNKN", "DNN", "DO", "DOCU", "DRYS", "DT", "DUK", "EA", "EBAY", "ELAN", "EOG", "EQT", "ESTC", "ET", "ETFC", "ETRN", "ETSY", "EXC", "F", "FANG", "FB", "FCX", "FDX", "FEYE", "FISV", "FIT", "FIVE", "FLR", "FLT", "FMCC", "FNMA", "FSCT", "FSLR", "FTCH", "GDDY", "GE", "GH", "GLBR", "GLW", "GM", "GME", "GNRC", "GOLD", "GOOGL", "GOOS", "GPRO", "GPS", "GRPN", "GRUB", "GSK", "GSKY", "HAL", "HCA", "HCAT", "HIG", "HLF", "HLT", "HOG", "HON", "HPE", "HPQ", "HRI", "HTZ", "IBKR", "ICE", "INFO", "INMD", "IQ", "IQV", "ISRG", "JBLU", "JCP", "JMIA", "JNPR", "KBR", "KLAC", "KMI", "KMX", "KNX", "KSS", "LC", "LEVI", "LHCG", "LLY", "LN", "LOW", "LULU", "LVS", "LYFT", "MA", "MDLZ", "MDR", "MGM", "MLCO", "MNK", "MO", "MOMO", "MRNA", "MRVL", "MS", "MSI", "MU", "MXIM", "NAVI", "NEM", "NET", "NFLX", "NIO", "NOK", "NOV", "NOW", "NTNX", "NTR", "NUAN", "NUE", "NVDA", "NVR", "NVS", "NWSA", "NXPI", "OAS", "OKTA", "OPRA", "ORCL", "OXY", "PANW", "PAYX", "PBR", "PCG", "PDD", "PE", "PEP", "PHM", "PINS", "PIR", "PM", "PRGO", "PS", "PSTG", "PTON", "PVTL", "PYPL", "QCOM", "QRTEA", "QRVO", "RACE", "RAD", "REEMF", "RGR", "RIG", "RIO", "RMBS", "ROKU", "RRC", "S", "SAVE", "SBUX", "SCCO", "SCHW", "SD", "SDC", "SHAK", "SHLDQ", "SHOP", "SINA", "SIRI", "SLB", "SNAP", "SOHU", "SONO", "SPLK", "SPOT", "SQ", "STNE", "STX", "SU", "SWAV", "SWCH", "SWI", "SWN", "SYMC", "T", "TAL", "TDC", "TEVA", "TGT", "TIF", "TLRY", "TM", "TME", "TOL", "TPR", "TPTX", "TRU", "TRUE", "TSLA", "TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA"]
     #Lean noETFs SLICE_n (41)
     #myTickers = ["TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA", "ZS", "ZUO"]
-    #myTickers =["A", "AMZN"]
-    myTickers =["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG"]
+    myTickers =["A", "AMZN"]
+    #myTickers =["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG"]
 
     #ES&NQ (181)
     #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DHR", "DIS", "DOW", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM", "ATVI", "AMD", "ALXN", "ALGN", "AAL", "ADI", "AMAT", "ASML", "ADSK", "ADP", "BIDU", "BMRN", "AVGO", "CDNS", "CERN", "CHKP", "CTAS", "CTXS", "CTSH", "CSX", "CTRP", "DLTR", "EBAY", "EA", "EXPE", "FAST", "FISV", "FOX", "FOXA", "HAS", "HSIC", "IDXX", "ILMN", "INCY", "INTU", "ISRG", "JBHT", "JD", "KLAC", "LRCX", "LBTYA", "LBTYK", "LULU", "MAR", "MXIM", "MELI", "MCHP", "MU", "MNST", "MYL", "NTAP", "NTES", "NXPI", "ORLY", "PCAR", "PAYX", "REGN", "ROST", "SIRI", "SWKS", "SYMC", "SNPS", "TMUS", "TTWO", "TSLA", "ULTA", "UAL", "VRSN", "VRSK", "VRTX", "WDAY", "WDC", "WLTW", "WYNN", "XEL", "XLNX", "STX", "TSLA", "VRSK", "WYNN", "XLNX"]
@@ -167,22 +167,40 @@ class Eq2_ai_4():
        "S_Rej_": 0}
     
     #AI ----
-    loadAI = False
+    loadAI = True
+    preproDict = {}
     aiDict = {}
     
+    preproDict ["CNNAE_1"] = {
+        "enabled": True,
+        "Type": "PT",
+        "modelClass": "CNN_AE_1",
+        "modelParams" : {"inHW": 50, 
+                        "inChannels": 1, 
+                        "cnnChannels1": 32, 
+                        "cnnChannels2": 64, 
+                        "outputs": 200, 
+                        "hiddenSize": 200, 
+                        "hiddenSizeDecode": 200},
+        "modelURL": "https://www.dropbox.com/s/eggeeegwtce4zfz/Test-CNN_AE_Model_20200701-09_03_c.txt?dl=1",
+        "model": None }
+
     aiDict["L_CNN1"] = {
-        "enabled": False,
+        "enabled": True,
         "signalRegex": "ALL",
         "direction": 1,
         "Type" : "PT_CNN",
         "firstTradeHour": 0,
         "lastTradeHour": 24,
         "riskMultiple": 1.00,
+        "modelClass": "NN_1",
+        "modelParams" : {"featureCount": 0, 
+                        "hiddenCount": 0, 
+                        "outFeed": "",
+                        "softmaxout": False,
+                        "outputs": 2},       
         "modelURL": "https://www.dropbox.com/s/mw9pg986o59e2c8/LGB_FX15m_L_Str%26DCH_s_3MM_3MM_FeatSel_2003_Model_20200307-18_14_booster.txt?dl=1",
         "model": None,
-        "featureCount": 0,
-        "hiddenCount": 0,
-        "outFeed": "",
         "usePCA": False,
         "pcaURL": '-',
         "pca": None,
@@ -277,6 +295,15 @@ class Eq2_ai_4():
         self.shortDisabledBars = 0
         self.longSimDisabledBars = 0
         self.shortSimDisabledBars = 0
+        
+        '''Set up Preprocessors'''
+        for preprKey, preprObj in self.CL.preproDict.items():
+            if self.CL.loadAI and preprObj["enabled"] and preprObj["model"]==None:
+                #Loading MODEL
+                if preprObj["Type"] == "PT":
+                    preprObj["model"] = globals()[preprObj["modelClass"]](**preprObj["modelParams"]).to('cpu')
+                    preprObj["model"] = hp3.MyModelLoader.LoadModelTorch(self, preprObj["modelURL"], existingmodel=preprObj["model"])
+                    self.algo.Debug(f' Torch MODEL ({preprKey}/{self.CL.strategyCode}) LOADED from url: {preprObj["modelURL"]}')
 
         '''Set up AI models'''
         self.signalDisabledBars = {}
@@ -288,7 +315,7 @@ class Eq2_ai_4():
                     self.algo.Debug(f' PCA ({aiKey}) LOADED from url: {aiObj["pcaURL"]}')
                 #Loading MODEL
                 if aiObj["Type"] == "PT":
-                    aiObj["model"] = NN_1(aiObj["featureCount"], hiddenSize=aiObj["hiddenCount"], outFeed=aiObj["outFeed"], softmaxout=False, outputs=2).to('cpu')
+                    aiObj["model"] = globals()[aiObj["modelClass"]](**aiObj["modelParams"]).to('cpu')
                     aiObj["model"] = hp3.MyModelLoader.LoadModelTorch(self, aiObj["modelURL"], existingmodel=aiObj["model"])
                     self.algo.Debug(f' Torch MODEL ({aiKey}/{self.CL.strategyCode}) LOADED from url: {aiObj["modelURL"]}')
                 elif aiObj["Type"] == "SK":
@@ -371,7 +398,7 @@ class Eq2_ai_4():
             aiObj["signal"] = aiObj["enabled"] and (signalRegex=="ALL" or re.search(signalRegex, self.signals)) and aiObj["firstTradeHour"] <= self.algo.Time.hour and self.algo.Time.hour <= aiObj["lastTradeHour"]
             if aiObj["signal"]:
                 #self.algo.MyDebug(f' Signal:{aiKey} {self.symbol}')
-                self.algo.signalsTotal+=1
+                #self.algo.signalsTotal+=1
                 if aiObj["rawFeatures"]=="rawFeatures1": loadFeatures1 = True
                 if aiObj["rawFeatures"]=="rawFeatures2": loadFeatures2 = True
         
@@ -391,6 +418,8 @@ class Eq2_ai_4():
         #Simulation should use this feature
         gasfSim = True
         intCode = [None, np.uint8, np.uint16][1] 
+        preProcessTest = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preproDict ["CNNAE_1"]["model"])
+        self.algo.MyDebug(f'{preProcessTest.shape}')
         if loadFeatures1 or (longTriggerSim or shortTriggerSim):
             #self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
@@ -426,7 +455,7 @@ class Eq2_ai_4():
             #This is for Stat5 signal compatibility
             self.signalDisabledBars[aiKey] = max(self.signalDisabledBars[aiKey]-1,0)
             #Long
-            if self.CL.loadAI and not (longTrigger or shortTrigger) and aiObj["enabled"] and aiObj["signal"] and aiObj["dfFilterPassed"] and self.signalDisabledBars[aiKey]==0:
+            if self.CL.loadAI and not (longTrigger or shortTrigger) and aiObj["enabled"] and aiObj["model"]!=None and aiObj["signal"] and aiObj["dfFilterPassed"] and self.signalDisabledBars[aiKey]==0:
                 #MODEL INFERENCE
                 if aiObj["Type"] == "PT" or aiObj["Type"] == "PT_CNN":
                     aiObj["model"].eval()
@@ -639,3 +668,105 @@ class NN_1(nn.Module):
        self.eval()
        prediction = self.forward(x).data.numpy()
        return prediction
+
+class CNN_AE_1(nn.Module):
+    def __init__(self, inHW, inChannels=1, cnnChannels1=16, cnnChannels2=16, outputs=20, hiddenSize=None, hiddenSizeDecode=None, dropoutRate=0.25, bn_momentum=0.1):
+        super(CNN_AE_1, self).__init__()
+        self.inHW = inHW
+        self.inChannels = inChannels
+        self.cnnChannels1 = cnnChannels1
+        self.cnnChannels2 = cnnChannels2
+        self.cnnFlattenedSize = round(self.inHW/4)**2 * self.cnnChannels2
+        self.hiddenSize = hiddenSize
+        self.hiddenSizeDecode = hiddenSizeDecode
+        self.dropoutRate = dropoutRate
+        self.outputs = outputs
+        self.kernel_size = [3, 5, 7, 9][1]
+
+        self.MyActivation = [nn.ReLU(), nn.LeakyReLU, nn.SELU][0]
+
+        #ENCODER
+        #n/4^2*self.cnnChannels2
+        self.CNN = nn.Sequential(
+            nn.BatchNorm2d(inChannels),
+            nn.Conv2d(inChannels, self.cnnChannels1, kernel_size=self.kernel_size, stride=1, padding=2),
+            self.MyActivation,
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.BatchNorm2d(self.cnnChannels1),
+            nn.Conv2d(self.cnnChannels1, self.cnnChannels2, kernel_size=self.kernel_size, stride=1, padding=2),
+            self.MyActivation,
+            nn.MaxPool2d(kernel_size=2, stride=2))
+                       
+        if self.hiddenSize!=None:
+            self.BN1 = nn.BatchNorm1d(num_features=self.cnnFlattenedSize, momentum=bn_momentum)
+            self.FC1 = nn.Linear(self.cnnFlattenedSize, self.hiddenSize)
+            self.BN2 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
+            self.FC2 = nn.Linear(self.hiddenSize, self.outputs)
+        else:
+            self.BN1 = nn.BatchNorm1d(num_features=self.cnnFlattenedSize, momentum=bn_momentum)
+            self.FC1 = nn.Linear(self.cnnFlattenedSize, self.outputs)
+
+        #DECODER
+        if self.hiddenSizeDecode!=None:
+            self.D_BN1 = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
+            self.D_NN1 = nn.Linear(self.outputs, self.hiddenSizeDecode)
+            self.D_BN2 = nn.BatchNorm1d(num_features=self.hiddenSizeDecode, momentum=bn_momentum)
+            self.D_NN2 = nn.Linear(self.hiddenSizeDecode, self.inHW*self.inHW*self.inChannels)
+        else:
+            self.D_BN1 = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
+            self.D_NN1 = nn.Linear(self.outputs, self.inHW*self.inHW*self.inChannels)
+
+    def forward(self, x):
+        x = self.Encode(x)
+        x = self.Decode(x)
+        return x  
+
+    def Encode(self, x):
+        samples = x.size(0) 
+        x = self.CNN(x)
+        x = x.view(samples, -1)
+        if self.hiddenSizeDecode!=None:
+            x = self.MyActivation(self.FC1(self.BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
+            x = self.MyActivation(self.FC2(self.BN2(F.dropout(x, p=self.dropoutRate, training=self.training))))
+        else:
+            x = self.MyActivation(self.FC1(self.BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
+        return x
+
+    def Decode(self, x):
+        samples = x.size(0) 
+        if self.hiddenSizeDecode!=None:
+            x = self.MyActivation(self.D_NN1(self.D_BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
+            x = self.MyActivation(self.D_NN2(self.D_BN2(F.dropout(x, p=self.dropoutRate, training=self.training))))
+            x = x.view([samples, self.inChannels, self.inHW, self.inHW])
+        else:
+            x = self.MyActivation(self.D_NN1(self.D_BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
+            x = x.view([samples, self.inChannels, self.inHW, self.inHW])
+        return x 
+    
+    def PreProcess(self, x, returnTorch=False):
+        self.eval()
+        while len(x.shape)<4:
+            x = np.expand_dims(x, axis=0)
+        x = torch.from_numpy(x).float().to('cpu')
+        x = self.Encode(x)
+        if returnTorch:
+            x = torch.squeeze(x)
+            return x
+        x = x.data.numpy()
+        x = np.squeeze(x)
+        return x
+
+    def EncodeDecode(self, x, returnTorch=False):
+        self.eval()
+        while len(x.shape)<4:
+            x = np.expand_dims(x, axis=0)
+        x = torch.from_numpy(x).float().to('cpu')
+        x = self.forward(x)
+        if returnTorch:
+            x = torch.squeeze(x)
+            return x
+        x = x.data.numpy()
+        x = np.squeeze(x)
+        return x
+

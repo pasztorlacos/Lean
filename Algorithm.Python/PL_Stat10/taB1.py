@@ -425,14 +425,14 @@ class MyGASF():
         
     #FEATURE EXTRACTOR
     #   For Simulation Stats use useGASF=False, picleFeatures=True
-    def FeatureExtractor(self, featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=False, intCode=None):
+    def FeatureExtractor(self, featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=False, intCode=None, preProcessor=None):
 
-        elif featureType == "Close":
+        if featureType == "Close":
             #Normaized Close only 
             _C_n = np.array([bar.Close for bar in self.myBars])
             Features = self.Norm(_C_n)
         
-        if featureType == "PriceBars":
+        elif featureType == "PriceBars":
             #Close, Upper shadow, Lower shadow, Body, Gap
             if barType == "CULBG":
                 _C_n = np.array([bar.Close for bar in self.myBars])
@@ -485,6 +485,7 @@ class MyGASF():
         if useGASF: Features = self.GASF_Transform(Features, positiveNormalize=True)
         if useFloat32: Features = Features.astype(np.single)
         if intCode!=None: Features = self.IntCoding(Features, encodeType=intCode)
+        if preProcessor!=None: Features = preProcessor.PreProcess(Features)
         if picleFeatures: Features = codecs.encode(pickle.dumps(Features, protocol= pickle.HIGHEST_PROTOCOL), "base64").decode()
         
         return Features
