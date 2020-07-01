@@ -426,6 +426,11 @@ class MyGASF():
     #FEATURE EXTRACTOR
     #   For Simulation Stats use useGASF=False, picleFeatures=True
     def FeatureExtractor(self, featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=False, intCode=None):
+
+        elif featureType == "Close":
+            #Normaized Close only 
+            _C_n = np.array([bar.Close for bar in self.myBars])
+            Features = self.Norm(_C_n)
         
         if featureType == "PriceBars":
             #Close, Upper shadow, Lower shadow, Body, Gap
@@ -450,16 +455,14 @@ class MyGASF():
                 _C = self.Norm(np.array([bar.Close for bar in self.myBars]))
                 Features = np.vstack((_O, _H, _L, _C))
         
-        elif featureType == "Close":
-            _C_n = np.array([bar.Close for bar in self.myBars])
-            Features = self.Norm(_C_n)
-        
         elif featureType == "ULRange":
+            #Normalized Upper and Lower Range
             _UR = self.Norm(np.array([bar.High-bar.Close for bar in self.myBars]))
             _LR = self.Norm(np.array([bar.Close-bar.Low for bar in self.myBars]))
             Features = np.vstack((_UR, _LR))
 
         elif featureType == "ULRG":
+            #Normalized Upper and Lower Range and Gap
             _UR = self.Norm(np.array([bar.High-bar.Close for bar in self.myBars]))
             _LR = self.Norm(np.array([bar.Close-bar.Low for bar in self.myBars]))
             _C_n = np.array([bar.Close for bar in self.myBars])

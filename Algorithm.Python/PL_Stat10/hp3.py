@@ -332,7 +332,7 @@ class MyHelpers:
     '''
     #slicer must be a slice object: slice(start, stop, step) or slice(stop) (https://data-flair.training/blogs/python-slice/) example: slice(0, 400, None)
     def UnpackFeatures (self, features, featureType=1, featureRegex='Feat', reshapeTuple=None, mySlicer=None):
-        useSingleFeatureList = False
+        #useSingleFeatureList = False
         dataBase = []
         rawDataHeader = []
         rawData = []
@@ -352,15 +352,14 @@ class MyHelpers:
                 rawData.append(x)
                 return rawData
 
-        if isinstance(features[0], list) and not useSingleFeatureList:
-            #if features is a list of lists
-            for i in range(0, len(features)):
+        for i in range(0, len(features)):
+            #features[i] is a list
+            if isinstance(features[i], list):
                 for j in range(0, len(features[i])):
                     rawDataHeader.append("Feat"+str(i)+'_'+str(j))
-                    rawData.append(features[i][j])
-        else:
-            #if features is a single list or useSingleFeatureList
-            for i in range(len(features)):
+                rawData.extend(features[i])
+            #features[i] is a single number
+            else:
                 rawDataHeader.append("Feat"+str(i))
                 rawData.append(features[i])
         dataBase.append(rawDataHeader)

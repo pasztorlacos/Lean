@@ -114,20 +114,20 @@ class MySIMPosition():
             #Fatures Header
             for i in range(0, len(features)):
                 if isinstance(features[i], list):
-                    #features i is a list
+                    #features[i] is a list
                     for j in range(0, len(features[i])):
                         self.rawDataHeader.append("Feat"+str(i)+'_'+str(j))
                 else:
-                    #features i is a single number 
+                    #features[i] is a single number 
                     self.rawDataHeader.append("Feat"+str(i))
 
         #Fill in Features
         for i in range(0, len(features)):
             if isinstance(features[i], list):
-                ##features i is a list, extend unpacks the list
+                #features[i] is a list, extend unpacks the list
                 self.positionData.extend(features[i])
             else:
-                #features i is a single number
+                #features[i] is a single number
                 self.positionData.append(features[i])
 
         '''Simulated Trades
