@@ -425,36 +425,47 @@ class MyGASF():
         
     #FEATURE EXTRACTOR
     #   For Simulation Stats use useGASF=False, picleFeatures=True
-    def FeatureExtractor(self, featureType="PriceBars", barType="CULBG", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=False, intCode=None, preProcessor=None):
+    def FeatureExtractor(self, featureType="Close", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=False, intCode=None, preProcessor=None):
 
         if featureType == "Close":
             #Normaized Close only 
             _C_n = np.array([bar.Close for bar in self.myBars])
             Features = self.Norm(_C_n)
         
-        elif featureType == "PriceBars":
-            #Close, Upper shadow, Lower shadow, Body, Gap
-            if barType == "CULBG":
-                _C_n = np.array([bar.Close for bar in self.myBars])
-                _C = self.Norm(_C_n)
-                _U = self.Norm(np.array([bar.High-bar.Close if bar.Close>bar.Open else bar.High-bar.Open for bar in self.myBars]))
-                _L = self.Norm(np.array([bar.Open-bar.Low if bar.Close>bar.Open else bar.Close-bar.Low for bar in self.myBars]))
-                _B = self.Norm(np.array([bar.Close-bar.Open for bar in self.myBars]))
-                _C_n_t1 = np.roll(_C_n, shift=-1, axis = 0) 
-                #_C_n_t1[len(_C_n_t1)-1] = 0 #this is no good as creates a huge gap at [len-1]
-                _C_n_t1[len(_C_n_t1)-1] = _C_n_t1[max(len(_C_n_t1)-2,0)] #this creates a 0 gap at [len-1] so no need for clear it
-                _G = np.array([bar.Open for bar in self.myBars])-_C_n_t1
-                #_G[len(_G)-1] = 0
-                _G = self.Norm(_G)
-                Features = np.vstack((_C, _U, _L, _B, _G)) if useGAP else np.vstack((_C, _U, _L, _B))
+        elif featureType == "OHLC":
             #OHLC
-            else:
-                _O = self.Norm(np.array([bar.Open for bar in self.myBars]))
-                _H = self.Norm(np.array([bar.High for bar in self.myBars]))
-                _L = self.Norm(np.array([bar.Low for bar in self.myBars]))
-                _C = self.Norm(np.array([bar.Close for bar in self.myBars]))
-                Features = np.vstack((_O, _H, _L, _C))
+            _O = self.Norm(np.array([bar.Open for bar in self.myBars]))
+            _H = self.Norm(np.array([bar.High for bar in self.myBars]))
+            _L = self.Norm(np.array([bar.Low for bar in self.myBars]))
+            _C = self.Norm(np.array([bar.Close for bar in self.myBars]))
+            Features = np.vstack((_O, _H, _L, _C))
         
+        elif featureType in ["CULBG", "ULBG", "_U", "_L", "_B", "_G"]:
+            #Close (if "CULBG"), Upper shadow, Lower shadow, Body, Gap
+            _C_n = np.array([bar.Close for bar in self.myBars])
+            _C = self.Norm(_C_n)
+            _U = self.Norm(np.array([bar.High-bar.Close if bar.Close>bar.Open else bar.High-bar.Open for bar in self.myBars]))
+            _L = self.Norm(np.array([bar.Open-bar.Low if bar.Close>bar.Open else bar.Close-bar.Low for bar in self.myBars]))
+            _B = self.Norm(np.array([bar.Close-bar.Open for bar in self.myBars]))
+            _C_n_t1 = np.roll(_C_n, shift=-1, axis = 0) 
+            #_C_n_t1[len(_C_n_t1)-1] = 0 #this is no good as creates a huge gap at [len-1]
+            _C_n_t1[len(_C_n_t1)-1] = _C_n_t1[max(len(_C_n_t1)-2,0)] #this creates a 0 gap at [len-1] so no need for clear it
+            _G = np.array([bar.Open for bar in self.myBars])-_C_n_t1
+            #_G[len(_G)-1] = 0
+            _G = self.Norm(_G)
+            if featureType == "CULBG":
+                Features = np.vstack((_C, _U, _L, _B, _G)) if useGAP else np.vstack((_C, _U, _L, _B))
+            elif featureType == "ULBG": 
+                Features = np.vstack((_U, _L, _B, _G)) if useGAP else np.vstack((_U, _L, _B))
+            elif featureType == "_U":
+                Features = _U
+            elif featureType == "_L":
+                Features = _L
+            elif featureType == "_B":
+                Features = _B
+            elif featureType == "_G":
+                Features = _G
+
         elif featureType == "ULRange":
             #Normalized Upper and Lower Range
             _UR = self.Norm(np.array([bar.High-bar.Close for bar in self.myBars]))

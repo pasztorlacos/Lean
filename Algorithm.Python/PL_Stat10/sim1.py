@@ -28,7 +28,7 @@ class MySIMPosition():
     rawClosedPositionsData = [] #list of completed positionData lists
     hasPosition=False
     useHeader=True
-    subStatName="\\Test-CNN_AE"
+    subStatName="\\CNN_AE-100-sm\\Close-2005_2019-EqAll\\S1"
     statName = "Stat10"+subStatName
     #statFolder="C:\\Github\\Stats\\"+statName+"\\"
     statFolder="X:\\My Drive\\\QCStats\\"+statName+"\\" #Mooved from "X:\\My Drive\\\QCData\\Stats\\"+statName+"\\"

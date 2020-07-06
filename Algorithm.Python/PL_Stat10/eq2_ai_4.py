@@ -31,7 +31,7 @@ class Eq2_ai_4():
     '''STRATEGY SETTINGS'''
     enabled = True
     manageOrderConsistency = True
-    simulate = False
+    simulate = True
     saveFilesFramework = True
     saveFilesSim = saveFilesFramework
     strategyCodeOriginal = __name__
@@ -118,8 +118,7 @@ class Eq2_ai_4():
     #Pi NoETF ALL
     #myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ", "BKNG", "BLK", "BOX", "BP", "BRK-B", "BSX", "BTU", "BURL", "BX", "BYND", "C", "CAKE", "CARS", "CBOE", "CCJ", "CDLX", "CELG", "CHK", "CHWY", "CIEN", "CLDR", "CLF", "CLNE", "CMCSA", "CME", "CMG", "CMI", "CNDT", "COP", "COST", "COUP", "CPB", "CREE", "CRM", "CRSP", "CRUS", "CRWD", "CSX", "CTRP", "CTSH", "CVS", "DBI", "DBX", "DD", "DE", "DECK", "DELL", "DG", "DKS", "DLTR", "DNKN", "DNN", "DO", "DOCU", "DRYS", "DT", "DUK", "EA", "EBAY", "ELAN", "EOG", "EQT", "ESTC", "ET", "ETFC", "ETRN", "ETSY", "EXC", "F", "FANG", "FB", "FCX", "FDX", "FEYE", "FISV", "FIT", "FIVE", "FLR", "FLT", "FMCC", "FNMA", "FSCT", "FSLR", "FTCH", "GDDY", "GE", "GH", "GLBR", "GLW", "GM", "GME", "GNRC", "GOLD", "GOOGL", "GOOS", "GPRO", "GPS", "GRPN", "GRUB", "GSK", "GSKY", "HAL", "HCA", "HCAT", "HIG", "HLF", "HLT", "HOG", "HON", "HPE", "HPQ", "HRI", "HTZ", "IBKR", "ICE", "INFO", "INMD", "IQ", "IQV", "ISRG", "JBLU", "JCP", "JMIA", "JNPR", "KBR", "KLAC", "KMI", "KMX", "KNX", "KSS", "LC", "LEVI", "LHCG", "LLY", "LN", "LOW", "LULU", "LVS", "LYFT", "MA", "MDLZ", "MDR", "MGM", "MLCO", "MNK", "MO", "MOMO", "MRNA", "MRVL", "MS", "MSI", "MU", "MXIM", "NAVI", "NEM", "NET", "NFLX", "NIO", "NOK", "NOV", "NOW", "NTNX", "NTR", "NUAN", "NUE", "NVDA", "NVR", "NVS", "NWSA", "NXPI", "OAS", "OKTA", "OPRA", "ORCL", "OXY", "PANW", "PAYX", "PBR", "PCG", "PDD", "PE", "PEP", "PHM", "PINS", "PIR", "PM", "PRGO", "PS", "PSTG", "PTON", "PVTL", "PYPL", "QCOM", "QRTEA", "QRVO", "RACE", "RAD", "REEMF", "RGR", "RIG", "RIO", "RMBS", "ROKU", "RRC", "S", "SAVE", "SBUX", "SCCO", "SCHW", "SD", "SDC", "SHAK", "SHLDQ", "SHOP", "SINA", "SIRI", "SLB", "SNAP", "SOHU", "SONO", "SPLK", "SPOT", "SQ", "STNE", "STX", "SU", "SWAV", "SWCH", "SWI", "SWN", "SYMC", "T", "TAL", "TDC", "TEVA", "TGT", "TIF", "TLRY", "TM", "TME", "TOL", "TPR", "TPTX", "TRU", "TRUE", "TSLA", "TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA"]
     #Lean noETFs SLICE_n (41)
-    #myTickers = ["TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA", "ZS", "ZUO"]
-    myTickers =["A", "AMZN"]
+    myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ"]   #myTickers =["A", "AMZN"]
     #myTickers =["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG"]
 
     #ES&NQ (181)
@@ -153,7 +152,7 @@ class Eq2_ai_4():
     
  #Simulation Signals [direction, disableBars, Enabled]
     simDict = {
-       "ALL_L": [1,8,True], "ALL_S": [-1,8,True],
+       "ALL_L": [1,16,True], "ALL_S": [-1,16,True],
        "L_Str_": [1,8,False], "S_Str_": [-1,8,False], 
        "L_Rej_": [1,8,False], "S_Rej_": [-1,8,False],
        "DB_": [1,8,False], "DT_": [-1,8,False], 
@@ -262,7 +261,7 @@ class Eq2_ai_4():
         self.vol = MyVolatility(self, self.algo, self.symbol, name='vol', period=200, atr=self.atr1)
         self.algo.RegisterIndicator(self.symbol, self.vol, self.consolidator)
         
-        self.gasf1 = MyGASF(self, self.algo, self.symbol, name='gasf1', period=50, atr=self.atr1, benchmarkTicker=None)
+        self.gasf1 = MyGASF(self, self.algo, self.symbol, name='gasf1', period=100, atr=self.atr1, benchmarkTicker=None)
         self.algo.RegisterIndicator(self.symbol, self.gasf1, self.consolidator)
 
         '''Indicators Higher Timeframe'''
@@ -329,7 +328,7 @@ class Eq2_ai_4():
         
         #Initialize signalDisabledBarsSim 
         self.signalDisabledBarsSim = {}
-        i = random.randint(0, 7)
+        i = random.randint(0, 14)
         for simKey, simObj in self.CL.simDict.items():
             self.signalDisabledBarsSim[simKey] = i
             i += 1
@@ -416,20 +415,21 @@ class Eq2_ai_4():
         '''FEATURES
         '''
         #Simulation should use this feature
-        gasfSim = True
-        intCode = [None, np.uint8, np.uint16][1] 
-        preProcessedFeature1 = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preproDict["CNNAE_1"]["model"])
-        self.algo.MyDebug(f'preProcessedFeature1: {preProcessedFeature1.shape}')
+        gasfSim = False
+        intCode = [None, np.uint8, np.uint16][2] 
+        if False:
+            preProcessedFeature1 = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preproDict["CNNAE_1"]["model"])
+            self.algo.MyDebug(f'preProcessedFeature1: {preProcessedFeature1.shape}')
         if loadFeatures1 or (longTriggerSim or shortTriggerSim):
-            #self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGAP=gasfSim, picleFeatures=True, intCode=intCode), \
+            #self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="CULBG", useGAP=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="Volume", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=gasfSim, picleFeatures=True, intCode=intCode)]
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, useFloat32=True, intCode=intCode)]
+            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode)]
 
         
         if loadFeatures2:
-            self.rawFeatures2 = [self.gasf1.FeatureExtractor(featureType="PriceBars", barType="CULBG", useGASF=True, picleFeatures=False), \
+            self.rawFeatures2 = [self.gasf1.FeatureExtractor(featureType="CULBG", useGASF=True, picleFeatures=False), \
                                 self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=True, picleFeatures=False), \
                                 self.gasf1.FeatureExtractor(featureType="Volume", useGASF=True, picleFeatures=False), \
                                 self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=True, picleFeatures=False)]
@@ -512,8 +512,8 @@ class Eq2_ai_4():
             myFeatures = self.rawFeatures1
         self.longSimDisabledBars=max(self.longSimDisabledBars-1,0)
         self.shortSimDisabledBars=max(self.shortSimDisabledBars-1,0)
-        simTradeTypes=[0,2,3,4,7,8,10] #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] 
-        simMinMaxTypes=[0,1] #[0,1,2,3]
+        simTradeTypes = [0,2] #[0,2,3,4,7,8,10] #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] 
+        simMinMaxTypes = [0,1] #[0,1,2,3]
         lastEntryDate = datetime(year = 3019, month = 10, day = 7)
         if self.CL.simulate and self.posEnabled and longTriggerSim and (self.algo.Time<self.algo.simEndDate or self.algo.simEndDate==None):
             if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Long: {self.signals}')
