@@ -120,6 +120,7 @@ class Eq2_ai_4():
     #Lean noETFs SLICE_n (41)
     myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ"]   #myTickers =["A", "AMZN"]
     #myTickers =["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG"]
+    #myTickers =["A", "AA"]
 
     #ES&NQ (181)
     #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DHR", "DIS", "DOW", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM", "ATVI", "AMD", "ALXN", "ALGN", "AAL", "ADI", "AMAT", "ASML", "ADSK", "ADP", "BIDU", "BMRN", "AVGO", "CDNS", "CERN", "CHKP", "CTAS", "CTXS", "CTSH", "CSX", "CTRP", "DLTR", "EBAY", "EA", "EXPE", "FAST", "FISV", "FOX", "FOXA", "HAS", "HSIC", "IDXX", "ILMN", "INCY", "INTU", "ISRG", "JBHT", "JD", "KLAC", "LRCX", "LBTYA", "LBTYK", "LULU", "MAR", "MXIM", "MELI", "MCHP", "MU", "MNST", "MYL", "NTAP", "NTES", "NXPI", "ORLY", "PCAR", "PAYX", "REGN", "ROST", "SIRI", "SWKS", "SYMC", "SNPS", "TMUS", "TTWO", "TSLA", "ULTA", "UAL", "VRSN", "VRSK", "VRTX", "WDAY", "WDC", "WLTW", "WYNN", "XEL", "XLNX", "STX", "TSLA", "VRSK", "WYNN", "XLNX"]
@@ -150,14 +151,14 @@ class Eq2_ai_4():
     #mySymbols = ["IBM", "MSFT", "XOM", "MMM"] #, "CVX", "PG", "GS", "HD", "CSCO", "INTC", "PFE", "WBA", "V", "WMT", "UTX"]
   
     
- #Simulation Signals [direction, disableBars, Enabled]
+ #Simulation Signals [direction, disableBars, Enabled, signalDisabledBars]
     simDict = {
-       "ALL_L": [1,16,True], "ALL_S": [-1,16,True],
-       "L_Str_": [1,8,False], "S_Str_": [-1,8,False], 
-       "L_Rej_": [1,8,False], "S_Rej_": [-1,8,False],
-       "DB_": [1,8,False], "DT_": [-1,8,False], 
-       "TB_": [1,8,False], "TT_": [-1,8,False],
-       "IHS_": [1,8,False], "HS_": [-1,8,False]}
+       "ALL_L": [1,16,True,0], "ALL_S": [-1,16,True,0],
+       "L_Str_": [1,8,False,0], "S_Str_": [-1,8,False,0], 
+       "L_Rej_": [1,8,False,0], "S_Rej_": [-1,8,False,0],
+       "DB_": [1,8,False,0], "DT_": [-1,8,False,0], 
+       "TB_": [1,8,False,0], "TT_": [-1,8,False,0],
+       "IHS_": [1,8,False,0], "HS_": [-1,8,False,0]}
     
     exitSignalDict = {
        "L_Str_": 0, 
@@ -326,12 +327,10 @@ class Eq2_ai_4():
                     self.algo.Debug(f' LGB MODEL ({aiKey}/{self.CL.strategyCode}) LOADED from url: {aiObj["modelURL"]}')
             self.signalDisabledBars[aiKey] = 0
         
-        #Initialize signalDisabledBarsSim 
+        #Initialize signalDisabledBarsSim
         self.signalDisabledBarsSim = {}
-        i = random.randint(0, 14)
         for simKey, simObj in self.CL.simDict.items():
-            self.signalDisabledBarsSim[simKey] = i
-            i += 1
+            self.signalDisabledBarsSim[simKey] = random.randint(1, 7) #len(self.CL.myTickers)
 
         #SET FILES TO BE SAVED AT THE END OF SIMULATION
         if self.CL.simulate:
@@ -425,7 +424,10 @@ class Eq2_ai_4():
             #                    self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="Volume", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=gasfSim, picleFeatures=True, intCode=intCode)]
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode)]
+            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode), \
+                                 self.gasf1.FeatureExtractor(featureType="ULBG", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode), \
+                                 self.gasf1.FeatureExtractor(featureType="Volume", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode), \
+                                 self.gasf1.FeatureExtractor(featureType="_B", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode)]
 
         
         if loadFeatures2:

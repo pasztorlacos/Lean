@@ -28,10 +28,8 @@ class MySIMPosition():
     rawClosedPositionsData = [] #list of completed positionData lists
     hasPosition=False
     useHeader=True
-    subStatName="\\CNN_AE-100-sm\\Close-2005_2019-EqAll\\S1"
-    statName = "Stat10"+subStatName
-    #statFolder="C:\\Github\\Stats\\"+statName+"\\"
-    statFolder="X:\\My Drive\\\QCStats\\"+statName+"\\" #Mooved from "X:\\My Drive\\\QCData\\Stats\\"+statName+"\\"
+    statFolder="X:\\My Drive\\QCStats\\Stat10\\CNN_AE-n100-2005_2019-EqAll\\"
+    subStatName="S0" #.csv statFile filename starts with it
     saveFiles = [] #List of lists or tuples (filePath, fileName)
     simsOpened = 0
     simsClosed = 0
