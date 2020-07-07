@@ -29,11 +29,10 @@ class MySIMPosition():
     hasPosition=False
     useHeader=True
     statFolder="X:\\My Drive\\QCStats\\Stat10\\CNN_AE-n100-2005_2019-EqAll\\"
-    subStatName="S0" #.csv statFile filename starts with it
+    subStatName="S3" #.csv statFile filename starts with it
     saveFiles = [] #List of lists or tuples (filePath, fileName)
     simsOpened = 0
     simsClosed = 0
-    codefilesSaved = False
     
     @classmethod
     def SaveData(cls, algo):
@@ -54,10 +53,9 @@ class MySIMPosition():
             os.makedirs(cls.statFolder)
               
         #Save Files
-        if not cls.codefilesSaved:
-            for savefile in cls.saveFiles:
-                shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + '_' + savefile[1] +'.py')
-            cls.codefilesSaved = True
+        for savefile in cls.saveFiles:
+            shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + '_' + savefile[1] +'.py')
+        cls.saveFiles = []
             
         #Save rawClosedPositionsData to csv file
         statFile = cls.statFolder + cls.subStatName + "_"+ datetime.now().strftime("%Y%m%d_%H_%M") + ".csv"
