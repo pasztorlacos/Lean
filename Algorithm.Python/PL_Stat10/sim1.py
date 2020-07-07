@@ -53,12 +53,13 @@ class MySIMPosition():
             os.makedirs(cls.statFolder)
               
         #Save Files
+        timeStr = datetime.now().strftime("%Y%m%d_%H_%M")
         for savefile in cls.saveFiles:
-            shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + datetime.now().strftime("%Y%m%d_%H_%M") + '_' + savefile[1] +'.py')
+            shutil.copyfile(os.path.abspath(savefile[0]), cls.statFolder + timeStr + '_' + savefile[1] +'.py')
         cls.saveFiles = []
             
         #Save rawClosedPositionsData to csv file
-        statFile = cls.statFolder + cls.subStatName + "_"+ datetime.now().strftime("%Y%m%d_%H_%M") + ".csv"
+        statFile = cls.statFolder + cls.subStatName + "_"+ timeStr + ".csv"
         if os.path.exists(statFile):
             os.remove(statFile)
         df = pd.DataFrame(cls.rawClosedPositionsData[1:], columns=cls.rawClosedPositionsData[0])
