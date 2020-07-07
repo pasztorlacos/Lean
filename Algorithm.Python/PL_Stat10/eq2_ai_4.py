@@ -153,7 +153,7 @@ class Eq2_ai_4():
     
  #Simulation Signals [direction, disableBars, Enabled, signalDisabledBars]
     simDict = {
-       "ALL_L": [1,16,True,0], "ALL_S": [-1,16,True,0],
+       "ALL_L": [1,len(myTickers),True,0], "ALL_S": [-1,len(myTickers),True,0],
        "L_Str_": [1,8,False,0], "S_Str_": [-1,8,False,0], 
        "L_Rej_": [1,8,False,0], "S_Rej_": [-1,8,False,0],
        "DB_": [1,8,False,0], "DT_": [-1,8,False,0], 
@@ -330,7 +330,7 @@ class Eq2_ai_4():
         #Initialize signalDisabledBarsSim
         self.signalDisabledBarsSim = {}
         for simKey, simObj in self.CL.simDict.items():
-            self.signalDisabledBarsSim[simKey] = random.randint(1, 7) #len(self.CL.myTickers)
+            self.signalDisabledBarsSim[simKey] = random.randint(1, len(self.CL.myTickers))
 
         #SET FILES TO BE SAVED AT THE END OF SIMULATION
         if self.CL.simulate:
