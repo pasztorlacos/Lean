@@ -425,7 +425,7 @@ class MyGASF():
         
     #FEATURE EXTRACTOR
     #   For Simulation Stats use useGASF=False, picleFeatures=True
-    def FeatureExtractor(self, featureType="Close", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=False, intCode=None, preProcessor=None):
+    def FeatureExtractor(self, featureType="Close", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=True, intCode=None, preProcessor=None):
 
         if featureType == "Close":
             #Normaized Close only 

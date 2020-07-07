@@ -186,7 +186,7 @@ class Eq2_ai_4():
         "model": None }
 
     aiDict["L_CNN1"] = {
-        "enabled": True,
+        "enabled": False,
         "signalRegex": "ALL",
         "direction": 1,
         "Type" : "PT_CNN",
@@ -424,10 +424,10 @@ class Eq2_ai_4():
             #                    self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="Volume", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
             #                    self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=gasfSim, picleFeatures=True, intCode=intCode)]
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode), \
-                                 self.gasf1.FeatureExtractor(featureType="ULBG", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode), \
-                                 self.gasf1.FeatureExtractor(featureType="Volume", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode), \
-                                 self.gasf1.FeatureExtractor(featureType="_B", useGASF=False, picleFeatures=True, useFloat32=True, intCode=intCode)]
+            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", useGASF=False, picleFeatures=True, intCode=intCode), \
+                                 self.gasf1.FeatureExtractor(featureType="ULBG", useGASF=False, picleFeatures=True, intCode=intCode), \
+                                 self.gasf1.FeatureExtractor(featureType="Volume", useGASF=False, picleFeatures=True, intCode=intCode), \
+                                 self.gasf1.FeatureExtractor(featureType="_B", useGASF=False, picleFeatures=True, intCode=intCode)]
 
         
         if loadFeatures2:
