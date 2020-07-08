@@ -366,7 +366,11 @@ class MyGASF():
     def GASF_Transform (self, x, unPickle=False, intDecode=None, unPickleOnly=False, positiveNormalize=True):
         if unPickle: x = pickle.loads(codecs.decode(x.encode(), "base64"))
         if intDecode!=None: x = self.IntCoding(x, intDecode, encode=False)
-        if unPickleOnly: return x
+        if unPickleOnly: 
+            if len(x.shape) == 1:
+                #add 1 extra dim as cnn needs channels even if it is 1
+                x = np.expand_dims(x, axis=0)
+            return x
 
         #Transformation Function
         def GASF(x_v):
@@ -496,7 +500,11 @@ class MyGASF():
         if useGASF: Features = self.GASF_Transform(Features, positiveNormalize=True)
         if useFloat32: Features = Features.astype(np.single)
         if intCode!=None: Features = self.IntCoding(Features, encodeType=intCode)
-        if preProcessor!=None: Features = preProcessor.PreProcess(Features)
+        if preProcessor!=None: 
+            if len(Features)==1:
+                #add 1 extra dim as cnn needs channels even if it is 1
+                Features = np.expand_dims(Features, axis=0)
+            Features = preProcessor.PreProcess(Features)
         if picleFeatures: Features = codecs.encode(pickle.dumps(Features, protocol= pickle.HIGHEST_PROTOCOL), "base64").decode()
         
         return Features
