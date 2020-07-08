@@ -28,7 +28,7 @@ class MySIMPosition():
     rawClosedPositionsData = [] #list of completed positionData lists
     hasPosition=False
     useHeader=True
-    statFolder="X:\\My Drive\\QCStats\\Stat10\\CNN_AE-n100-2005_2019-EqAll\\"
+    statFolder="X:\\My Drive\\QCStats\\Stat11\\Stat-n100-2005_2019-EqAll\\"
     subStatName="S7" #.csv statFile filename starts with it
     saveFiles = [] #List of lists or tuples (filePath, fileName)
     simsOpened = 0

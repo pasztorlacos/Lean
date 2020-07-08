@@ -433,58 +433,52 @@ class MyGASF():
 
         if featureType == "Close":
             #Normaized Close only 
-            _C_n = np.array([bar.Close for bar in self.myBars])
-            Features = self.Norm(_C_n)
+            Features = self.Norm(np.array([bar.Close for bar in self.myBars]))
         
         elif featureType == "OHLC":
             #OHLC
-            _O = self.Norm(np.array([bar.Open for bar in self.myBars]))
-            _H = self.Norm(np.array([bar.High for bar in self.myBars]))
-            _L = self.Norm(np.array([bar.Low for bar in self.myBars]))
-            _C = self.Norm(np.array([bar.Close for bar in self.myBars]))
-            Features = np.vstack((_O, _H, _L, _C))
+            _O = np.array([bar.Open for bar in self.myBars])
+            _H = np.array([bar.High for bar in self.myBars])
+            _L = np.array([bar.Low for bar in self.myBars])
+            _C = np.array([bar.Close for bar in self.myBars])
+            Features = self.Norm(np.vstack((_O, _H, _L, _C)))
         
-        elif featureType in ["CULBG", "ULBG", "_U", "_L", "_B", "_G"]:
+        elif featureType in ["ULBG", "_U", "_L", "_B", "_G"]:
             #Close (if "CULBG"), Upper shadow, Lower shadow, Body, Gap
-            _C_n = np.array([bar.Close for bar in self.myBars])
-            _C = self.Norm(_C_n)
-            _U = self.Norm(np.array([bar.High-bar.Close if bar.Close>bar.Open else bar.High-bar.Open for bar in self.myBars]))
-            _L = self.Norm(np.array([bar.Open-bar.Low if bar.Close>bar.Open else bar.Close-bar.Low for bar in self.myBars]))
-            _B = self.Norm(np.array([bar.Close-bar.Open for bar in self.myBars]))
-            _C_n_t1 = np.roll(_C_n, shift=-1, axis = 0) 
-            #_C_n_t1[len(_C_n_t1)-1] = 0 #this is no good as creates a huge gap at [len-1]
-            _C_n_t1[len(_C_n_t1)-1] = _C_n_t1[max(len(_C_n_t1)-2,0)] #this creates a 0 gap at [len-1] so no need for clear it
-            _G = np.array([bar.Open for bar in self.myBars])-_C_n_t1
-            #_G[len(_G)-1] = 0
-            _G = self.Norm(_G)
-            if featureType == "CULBG":
-                Features = np.vstack((_C, _U, _L, _B, _G)) if useGAP else np.vstack((_C, _U, _L, _B))
-            elif featureType == "ULBG": 
-                Features = np.vstack((_U, _L, _B, _G)) if useGAP else np.vstack((_U, _L, _B))
+            _C = np.array([bar.Close for bar in self.myBars])
+            _U = np.array([bar.High-bar.Close if bar.Close>bar.Open else bar.High-bar.Open for bar in self.myBars])
+            _L = np.array([bar.Open-bar.Low if bar.Close>bar.Open else bar.Close-bar.Low for bar in self.myBars])
+            _B = np.array([bar.Close-bar.Open for bar in self.myBars])
+            _C_t1 = np.roll(_C, shift=-1, axis = 0) 
+            _G = np.array([bar.Open for bar in self.myBars])-_C_t1
+            _G[len(_G)-1] = 0   #this creates a 0 gap at [len-1] as we don't know what the gap was there
+
+            if featureType == "ULBG": 
+                Features = self.Norm(np.vstack((_U, _L, _B, _G))) if useGAP else self.Norm(np.vstack((_U, _L, _B)))
             elif featureType == "_U":
-                Features = _U
+                Features = self.Norm(_U)
             elif featureType == "_L":
-                Features = _L
+                Features = self.Norm(_L)
             elif featureType == "_B":
-                Features = _B
+                Features = self.Norm(_B)
             elif featureType == "_G":
-                Features = _G
+                Features = self.Norm(_G)
 
         elif featureType == "ULRange":
             #Normalized Upper and Lower Range
-            _UR = self.Norm(np.array([bar.High-bar.Close for bar in self.myBars]))
-            _LR = self.Norm(np.array([bar.Close-bar.Low for bar in self.myBars]))
-            Features = np.vstack((_UR, _LR))
+            _UR = np.array([bar.High-bar.Close for bar in self.myBars])
+            _LR = np.array([bar.Close-bar.Low for bar in self.myBars])
+            Features = self.Norm(np.vstack((_UR, _LR)))
 
         elif featureType == "ULRG":
             #Normalized Upper and Lower Range and Gap
-            _UR = self.Norm(np.array([bar.High-bar.Close for bar in self.myBars]))
-            _LR = self.Norm(np.array([bar.Close-bar.Low for bar in self.myBars]))
-            _C_n = np.array([bar.Close for bar in self.myBars])
-            _C_n_t1 = np.roll(_C_n, shift=-1, axis = 0) 
-            _C_n_t1[len(_C_n_t1)-1] = _C_n_t1[max(len(_C_n_t1)-2,0)] #this creates a 0 gap at [len-1]
-            _G = self.Norm(np.array([bar.Open for bar in self.myBars])-_C_n_t1)
-            Features = np.vstack((_UR, _LR, _G))
+            _UR = np.array([bar.High-bar.Close for bar in self.myBars])
+            _LR = np.array([bar.Close-bar.Low for bar in self.myBars])
+            _C = np.array([bar.Close for bar in self.myBars])
+            _C_t1 = np.roll(_C, shift=-1, axis = 0) 
+            _G = np.array([bar.Open for bar in self.myBars])-_C_t1
+            _G[len(_G)-1] = 0   #this creates a 0 gap at [len-1] as we don't know what the gap was there
+            Features = self.Norm(np.vstack((_UR, _LR, _G)))
 
         elif featureType == "RelativePrice":
             Features = self.Norm(np.array(self.relativeClose))
@@ -495,7 +489,7 @@ class MyGASF():
         elif featureType == "Volatility":
             Features = self.Norm(np.array(self.volatility))
         
-        #in case of vectors (time series only) one extra dim as channel=1 added during gasf so output also is in (1, ch, n, n) format
+        # in case of vectors (time series only) one extra dim as channel=1 added during gasf so output also is in (1, ch, n, n) format
         #   if no gasf is used only pickled, numpy time series as vectors or OHLC stacked to matrix is pickled
         if useGASF: Features = self.GASF_Transform(Features, positiveNormalize=True)
         if useFloat32: Features = Features.astype(np.single)
