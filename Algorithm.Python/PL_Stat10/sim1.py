@@ -29,7 +29,7 @@ class MySIMPosition():
     hasPosition=False
     useHeader=True
     statFolder="X:\\My Drive\\QCStats\\Stat11\\Stat-n100-2005_2019-EqAll\\"
-    subStatName="S6" #.csv statFile filename starts with it
+    subStatName="S8" #.csv statFile filename starts with it
     saveFiles = [] #List of lists or tuples (filePath, fileName)
     simsOpened = 0
     simsClosed = 0

@@ -430,7 +430,7 @@ class MyGASF():
     #FEATURE EXTRACTOR
     #   For Simulation Stats use useGASF=False, picleFeatures=True
     def FeatureExtractor(self, n=None, featureType="Close", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=True, intCode=None, preProcessor=None):
-        if n!=None n=min(n, len(self.myBars)) else n=len(self.myBars)
+        n = min(n, len(self.myBars)) if n!=None else len(self.myBars)
         
         if featureType == "Close":
             #Normaized Close only 
