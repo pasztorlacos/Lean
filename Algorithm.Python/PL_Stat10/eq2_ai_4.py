@@ -8,7 +8,7 @@ from QuantConnect.Data.Market import IBaseDataBar, TradeBar
 
 from datetime import datetime, timedelta, date
 from ta1 import MyRelativePrice, MyPriceNormaliser, MyZigZag, MyDCHState, MyMAState, MySupportResistance, MyPatterns, MyVolatility
-from taB1 import MyBarStrength, MyBarRejection, MyGASF
+from taB1 import MyBarStrength, MyBarRejection, MyBPA, MyGASF
 from sim1 import MySIMPosition
 #from m_pt1 import NN_1
 
@@ -44,8 +44,8 @@ class Eq2_ai_4():
     #Resolution
     resolutionMinutes   = 60
     resolutionMinutes_2 = 24*60
-    maxWarmUpPeriod   = 430
-    maxWarmUpPeriod_2 = 120
+    maxWarmUpPeriod   = 110
+    maxWarmUpPeriod_2 = 110
     barPeriod   =  timedelta(minutes=resolutionMinutes)
     barPeriod_2 =  timedelta(minutes=resolutionMinutes_2)
     if isEquity:
@@ -118,8 +118,8 @@ class Eq2_ai_4():
     #Pi NoETF ALL
     #myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ", "BKNG", "BLK", "BOX", "BP", "BRK-B", "BSX", "BTU", "BURL", "BX", "BYND", "C", "CAKE", "CARS", "CBOE", "CCJ", "CDLX", "CELG", "CHK", "CHWY", "CIEN", "CLDR", "CLF", "CLNE", "CMCSA", "CME", "CMG", "CMI", "CNDT", "COP", "COST", "COUP", "CPB", "CREE", "CRM", "CRSP", "CRUS", "CRWD", "CSX", "CTRP", "CTSH", "CVS", "DBI", "DBX", "DD", "DE", "DECK", "DELL", "DG", "DKS", "DLTR", "DNKN", "DNN", "DO", "DOCU", "DRYS", "DT", "DUK", "EA", "EBAY", "ELAN", "EOG", "EQT", "ESTC", "ET", "ETFC", "ETRN", "ETSY", "EXC", "F", "FANG", "FB", "FCX", "FDX", "FEYE", "FISV", "FIT", "FIVE", "FLR", "FLT", "FMCC", "FNMA", "FSCT", "FSLR", "FTCH", "GDDY", "GE", "GH", "GLBR", "GLW", "GM", "GME", "GNRC", "GOLD", "GOOGL", "GOOS", "GPRO", "GPS", "GRPN", "GRUB", "GSK", "GSKY", "HAL", "HCA", "HCAT", "HIG", "HLF", "HLT", "HOG", "HON", "HPE", "HPQ", "HRI", "HTZ", "IBKR", "ICE", "INFO", "INMD", "IQ", "IQV", "ISRG", "JBLU", "JCP", "JMIA", "JNPR", "KBR", "KLAC", "KMI", "KMX", "KNX", "KSS", "LC", "LEVI", "LHCG", "LLY", "LN", "LOW", "LULU", "LVS", "LYFT", "MA", "MDLZ", "MDR", "MGM", "MLCO", "MNK", "MO", "MOMO", "MRNA", "MRVL", "MS", "MSI", "MU", "MXIM", "NAVI", "NEM", "NET", "NFLX", "NIO", "NOK", "NOV", "NOW", "NTNX", "NTR", "NUAN", "NUE", "NVDA", "NVR", "NVS", "NWSA", "NXPI", "OAS", "OKTA", "OPRA", "ORCL", "OXY", "PANW", "PAYX", "PBR", "PCG", "PDD", "PE", "PEP", "PHM", "PINS", "PIR", "PM", "PRGO", "PS", "PSTG", "PTON", "PVTL", "PYPL", "QCOM", "QRTEA", "QRVO", "RACE", "RAD", "REEMF", "RGR", "RIG", "RIO", "RMBS", "ROKU", "RRC", "S", "SAVE", "SBUX", "SCCO", "SCHW", "SD", "SDC", "SHAK", "SHLDQ", "SHOP", "SINA", "SIRI", "SLB", "SNAP", "SOHU", "SONO", "SPLK", "SPOT", "SQ", "STNE", "STX", "SU", "SWAV", "SWCH", "SWI", "SWN", "SYMC", "T", "TAL", "TDC", "TEVA", "TGT", "TIF", "TLRY", "TM", "TME", "TOL", "TPR", "TPTX", "TRU", "TRUE", "TSLA", "TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA"]
     #Lean noETFs SLICE_n (41)
-    myTickers = ["TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA", "ZS", "ZUO"]
-    #myTickers =["A", "AA"]
+    #myTickers = ["TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA", "ZS", "ZUO"]
+    myTickers =["A", "AA"]
 
     #ES&NQ (181)
     #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DHR", "DIS", "DOW", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM", "ATVI", "AMD", "ALXN", "ALGN", "AAL", "ADI", "AMAT", "ASML", "ADSK", "ADP", "BIDU", "BMRN", "AVGO", "CDNS", "CERN", "CHKP", "CTAS", "CTXS", "CTSH", "CSX", "CTRP", "DLTR", "EBAY", "EA", "EXPE", "FAST", "FISV", "FOX", "FOXA", "HAS", "HSIC", "IDXX", "ILMN", "INCY", "INTU", "ISRG", "JBHT", "JD", "KLAC", "LRCX", "LBTYA", "LBTYK", "LULU", "MAR", "MXIM", "MELI", "MCHP", "MU", "MNST", "MYL", "NTAP", "NTES", "NXPI", "ORLY", "PCAR", "PAYX", "REGN", "ROST", "SIRI", "SWKS", "SYMC", "SNPS", "TMUS", "TTWO", "TSLA", "ULTA", "UAL", "VRSN", "VRSK", "VRTX", "WDAY", "WDC", "WLTW", "WYNN", "XEL", "XLNX", "STX", "TSLA", "VRSK", "WYNN", "XLNX"]
@@ -167,28 +167,49 @@ class Eq2_ai_4():
     
     #AI ----
     loadAI = True
-    preproDict = {}
+    preprocDict = {}
     aiDict = {}
     
-    preproDict ["CNNAE_1"] = {
+    preprocDict ["CAE_1D_100-16_sm"] = {
         "enabled": True,
-        "Type": "PT",
+        "Type": ["PT"][0],
         "modelClass": "CNN_AE_1",
-        "modelParams" : {"inHW": 50, 
-                        "inChannels": 1, 
-                        "cnnChannels1": 32, 
-                        "cnnChannels2": 64, 
-                        "outputs": 200, 
-                        "hiddenSize": 200, 
-                        "hiddenSizeDecode": 200},
-        "modelURL": "https://www.dropbox.com/s/eggeeegwtce4zfz/Test-CNN_AE_Model_20200701-09_03_c.txt?dl=1",
-        "model": None }
+        "modelParams" : {"cnn_Dim": [1,2][0],
+                       "inH": 1,
+                       "inW": 100,
+                       "inChannels": 1,
+                       "cnnChannels1": 64,
+                       "cnnChannels2": 128,
+                       "outputs": 16,
+                       "useConvTranspose": False,
+                       "hiddenSize": [None, 64][0],
+                       "hiddenSizeDecode": [None, 64][0],
+                       "dropoutRate": 0.10},
+        "modelURL": "https://www.dropbox.com/s/ram9c51d5m1cvqn/CAE_1D_100-16_sm_Model_20200711-16_41_c.txt?dl=1",
+        "model": None}
+    preprocDict ["CAE_1D_50-8_sm"] = {
+        "enabled": True,
+        "Type": ["PT"][0],
+        "modelClass": "CNN_AE_1",
+        "modelParams" : {"cnn_Dim": [1,2][0],
+                       "inH": 1,
+                       "inW": 50,
+                       "inChannels": 1,
+                       "cnnChannels1": 64,
+                       "cnnChannels2": 128,
+                       "outputs": 8,
+                       "useConvTranspose": False,
+                       "hiddenSize": [None, 64][0],
+                       "hiddenSizeDecode": [None, 64][0],
+                       "dropoutRate": 0.10},
+        "modelURL": "https://www.dropbox.com/s/u80fqif5h3zfpyk/CAE_1D_50-8_sm_Model_20200711-18_14_c.txt?dl=1",
+        "model": None}
 
     aiDict["L_CNN1"] = {
         "enabled": False,
         "signalRegex": "ALL",
         "direction": 1,
-        "Type" : "PT_CNN",
+        "Type" : ["SK", "LGB", "PT", "PT_CNN"][2],
         "firstTradeHour": 0,
         "lastTradeHour": 24,
         "riskMultiple": 1.00,
@@ -201,7 +222,7 @@ class Eq2_ai_4():
         "modelURL": "https://www.dropbox.com/s/mw9pg986o59e2c8/LGB_FX15m_L_Str%26DCH_s_3MM_3MM_FeatSel_2003_Model_20200307-18_14_booster.txt?dl=1",
         "model": None,
         "usePCA": False,
-        "pcaURL": '-',
+        "pcaURL": None,
         "pca": None,
         "rawFeatures": "rawFeatures2",
         "threshold": 0.0,
@@ -238,7 +259,7 @@ class Eq2_ai_4():
         '''Indicators'''
         self.atr1 = AverageTrueRange(15)
         self.algo.RegisterIndicator(self.symbol, self.atr1, self.consolidator)
-        self.atr2 = AverageTrueRange(70)
+        self.atr2 = AverageTrueRange(50)
         self.algo.RegisterIndicator(self.symbol, self.atr2, self.consolidator)
         
         self.dch_s = DonchianChannel(3)
@@ -270,7 +291,7 @@ class Eq2_ai_4():
         self.dch2_2 = DonchianChannel(100)
         self.algo.RegisterIndicator(self.symbol, self.dch2_2, self.consolidator_2)
 
-        self.gasf1_2 = MyGASF(self, self.algo, self.symbol, name='gasf1_2', period=50, atr=self.atr1_2, benchmarkTicker=None)
+        self.gasf1_2 = MyGASF(self, self.algo, self.symbol, name='gasf1_2', period=100, atr=self.atr1_2, benchmarkTicker=None)
         self.algo.RegisterIndicator(self.symbol, self.gasf1_2, self.consolidator)
 
         '''Symbol State and Features'''
@@ -284,6 +305,10 @@ class Eq2_ai_4():
         self.barRejection1 = MyBarRejection(self, self.algo, self.symbol, name='barRejection1', period=10, atr=self.atr1, lookbackLong=3, lookbackShort=3, \
                rejectionPriceTravelLong=1.75, rejectionPriceTravelShort=1.75, rejectionPriceRangeLong=0.40, rejectionPriceRangeShort=0.40, referenceTypeLong='Close', referenceTypeShort='Close')
         self.algo.RegisterIndicator(self.symbol, self.barRejection1, self.consolidator)
+
+        self.bpa1 = MyBPA(self, self.algo, self.symbol, name='bpa1', period=10, atr=self.atr1, lookbackLong=1, lookbackShort=1, \
+                    minBarAtrLong=1.0, minBarAtrShort=1.0, referenceTypeLong='Close', referenceTypeShort='Close', gapATRLimitLong=1.0, gapATRLimitShort=1.0)
+        self.algo.RegisterIndicator(self.symbol, self.bpa1, self.consolidator)
         
         '''Signals and Events string Container'''
         self.signals = ''
@@ -296,7 +321,7 @@ class Eq2_ai_4():
         self.shortSimDisabledBars = 0
         
         '''Set up Preprocessors'''
-        for preprKey, preprObj in self.CL.preproDict.items():
+        for preprKey, preprObj in self.CL.preprocDict.items():
             if self.CL.loadAI and preprObj["enabled"] and preprObj["model"]==None:
                 #Loading MODEL
                 if preprObj["Type"] == "PT":
@@ -313,7 +338,7 @@ class Eq2_ai_4():
                     aiObj["pca"] = hp3.MyModelLoader.LoadModelPickled(self, aiObj["pcaURL"])
                     self.algo.Debug(f' PCA ({aiKey}) LOADED from url: {aiObj["pcaURL"]}')
                 #Loading MODEL
-                if aiObj["Type"] == "PT":
+                if aiObj["Type"] == "PT" or aiObj["Type"] == "PT_CNN":
                     aiObj["model"] = globals()[aiObj["modelClass"]](**aiObj["modelParams"]).to('cpu')
                     aiObj["model"] = hp3.MyModelLoader.LoadModelTorch(self, aiObj["modelURL"], existingmodel=aiObj["model"])
                     self.algo.Debug(f' Torch MODEL ({aiKey}/{self.CL.strategyCode}) LOADED from url: {aiObj["modelURL"]}')
@@ -416,24 +441,21 @@ class Eq2_ai_4():
         gasfSim = False
         intCode = [None, np.uint8, np.uint16][2] 
         if False:
-            preProcessedFeature1 = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preproDict["CNNAE_1"]["model"])
+            preProcessedFeature1 = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preprocDict["CNNAE_1"]["model"])
             self.algo.MyDebug(f'preProcessedFeature1: {preProcessedFeature1.shape}')
         if loadFeatures1 or (longTriggerSim or shortTriggerSim):
-            #self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="CULBG", useGAP=gasfSim, picleFeatures=True, intCode=intCode), \
-            #                    self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
-            #                    self.gasf1.FeatureExtractor(featureType="Volume", useGASF=gasfSim, picleFeatures=True, intCode=intCode), \
-            #                    self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=gasfSim, picleFeatures=True, intCode=intCode)]
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", useGASF=False, picleFeatures=True, intCode=intCode), \
-                                 self.gasf1.FeatureExtractor(featureType="ULBG", useGASF=False, picleFeatures=True, intCode=intCode), \
-                                 self.gasf1.FeatureExtractor(featureType="Volume", useGASF=False, picleFeatures=True, intCode=intCode), \
-                                 self.gasf1.FeatureExtractor(featureType="_B", useGASF=False, picleFeatures=True, intCode=intCode)]
-
+            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", preProcessor=self.CL.preprocDict ["CAE_1D_100-16_sm"]["model"], returnList=True), \
+                                 self.gasf1.FeatureExtractor(n=8, featureType="ULBG", returnList=True), \
+                                 self.gasf1.FeatureExtractor(n=50, featureType="RelativePrice", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
+                                 self.gasf1.FeatureExtractor(n=50, featureType="Volatility", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
+                                 self.gasf1_2.FeatureExtractor(featureType="Close", preProcessor=self.CL.preprocDict ["CAE_1D_100-16_sm"]["model"], returnList=True), \
+                                 self.gasf1_2.FeatureExtractor(n=8, featureType="ULBG", returnList=True), \
+                                 self.gasf1_2.FeatureExtractor(n=50, featureType="RelativePrice", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
+                                 self.gasf1_2.FeatureExtractor(n=50, featureType="Volatility", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
+                                 self.gasf1_2.FeatureExtractor(n=8, featureType="Volume", returnList=True)]
         
         if loadFeatures2:
-            self.rawFeatures2 = [self.gasf1.FeatureExtractor(featureType="CULBG", useGASF=True, picleFeatures=False), \
-                                self.gasf1.FeatureExtractor(featureType="RelativePrice", useGASF=True, picleFeatures=False), \
-                                self.gasf1.FeatureExtractor(featureType="Volume", useGASF=True, picleFeatures=False), \
-                                self.gasf1.FeatureExtractor(featureType="Volatility", useGASF=True, picleFeatures=False)]
+            self.rawFeatures2 = []
  
         for aiObj in self.CL.aiDict.values():
             if aiObj["enabled"] and aiObj["signal"]: 
@@ -671,34 +693,46 @@ class NN_1(nn.Module):
        return prediction
 
 class CNN_AE_1(nn.Module):
-    def __init__(self, inHW, inChannels=1, cnnChannels1=16, cnnChannels2=16, outputs=20, hiddenSize=None, hiddenSizeDecode=None, dropoutRate=0.25, bn_momentum=0.1):
+    def __init__(self, cnn_Dim, inH, inW, inChannels=1, cnnChannels1=16, cnnChannels2=16, hiddenSize=None, outputs=20, useConvTranspose=False, hiddenSizeDecode=None, dropoutRate=0.25, bn_momentum=0.1):
         super(CNN_AE_1, self).__init__()
-        self.inHW = inHW
+        self.cnn_Dim = cnn_Dim-1 #1:1D, 2:2D
+        self.inH = inH
+        self.inW = inW
         self.inChannels = inChannels
         self.cnnChannels1 = cnnChannels1
         self.cnnChannels2 = cnnChannels2
-        self.cnnFlattenedSize = round(self.inHW/4)**2 * self.cnnChannels2
+        self.cnnFlattenedSize = round(self.inW/4) * self.cnnChannels2 if self.cnn_Dim==0 else round(self.inH/4)*round(self.inW/4) * self.cnnChannels2 
         self.hiddenSize = hiddenSize
         self.hiddenSizeDecode = hiddenSizeDecode
         self.dropoutRate = dropoutRate
         self.outputs = outputs
         self.kernel_size = [3, 5, 7, 9][1]
+        self.padding = round((self.kernel_size-1)/2)
+        self.useConvTranspose = useConvTranspose
+        self.kernel_size_T = [2, 4, 6, 8][1]
+        self.padding_T = round((self.kernel_size_T-2)/2)
 
         self.MyActivation = [nn.ReLU(), nn.LeakyReLU, nn.SELU][0]
 
+        self.cnn_BatchNorm = [nn.BatchNorm1d, nn.BatchNorm2d][self.cnn_Dim]
+        self.cnn_Conv =  [nn.Conv1d,  nn.Conv2d][self.cnn_Dim]
+        self.cnn_MaxPool = [nn.MaxPool1d, nn.MaxPool2d][self.cnn_Dim]
+
+        if self.useConvTranspose:
+            self.cnn_ConvT = [nn.ConvTranspose1d,  nn.ConvTranspose2d][self.cnn_Dim]
+        
         #ENCODER
         #n/4^2*self.cnnChannels2
         self.CNN = nn.Sequential(
-            nn.BatchNorm2d(inChannels),
-            nn.Conv2d(inChannels, self.cnnChannels1, kernel_size=self.kernel_size, stride=1, padding=2),
-            self.MyActivation,
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
-            nn.BatchNorm2d(self.cnnChannels1),
-            nn.Conv2d(self.cnnChannels1, self.cnnChannels2, kernel_size=self.kernel_size, stride=1, padding=2),
-            self.MyActivation,
-            nn.MaxPool2d(kernel_size=2, stride=2))
-                       
+                        self.cnn_BatchNorm(inChannels),
+                        self.cnn_Conv(inChannels, self.cnnChannels1, kernel_size=self.kernel_size, stride=1, padding=self.padding),
+                        self.MyActivation,
+                        self.cnn_MaxPool(kernel_size=2, stride=2),
+                        self.cnn_BatchNorm(self.cnnChannels1),
+                        self.cnn_Conv(self.cnnChannels1, self.cnnChannels2, kernel_size=self.kernel_size, stride=1, padding=self.padding),
+                        self.MyActivation,
+                        self.cnn_MaxPool(kernel_size=2, stride=2))
+        
         if self.hiddenSize!=None:
             self.BN1 = nn.BatchNorm1d(num_features=self.cnnFlattenedSize, momentum=bn_momentum)
             self.FC1 = nn.Linear(self.cnnFlattenedSize, self.hiddenSize)
@@ -709,14 +743,24 @@ class CNN_AE_1(nn.Module):
             self.FC1 = nn.Linear(self.cnnFlattenedSize, self.outputs)
 
         #DECODER
-        if self.hiddenSizeDecode!=None:
-            self.D_BN1 = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
-            self.D_NN1 = nn.Linear(self.outputs, self.hiddenSizeDecode)
-            self.D_BN2 = nn.BatchNorm1d(num_features=self.hiddenSizeDecode, momentum=bn_momentum)
-            self.D_NN2 = nn.Linear(self.hiddenSizeDecode, self.inHW*self.inHW*self.inChannels)
+        if self.useConvTranspose:
+                self.D_BN_T = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
+                self.D_NN_T = nn.Linear(self.outputs, self.cnnChannels2*round(self.inH/4)*round(self.inW/4)) if self.cnn_Dim==1 else nn.Linear(self.outputs, self.cnnChannels2*round(self.inW/4))
+                
+                self.CNN_T = nn.Sequential(
+                                self.cnn_ConvT(self.cnnChannels2, self.cnnChannels1, kernel_size=self.kernel_size_T, stride=2, padding=self.padding_T),
+                                self.MyActivation,
+                                self.cnn_ConvT(self.cnnChannels1, self.inChannels, kernel_size=self.kernel_size_T, stride=2, padding=self.padding_T),
+                                nn.Tanh())
         else:
-            self.D_BN1 = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
-            self.D_NN1 = nn.Linear(self.outputs, self.inHW*self.inHW*self.inChannels)
+            if self.hiddenSizeDecode!=None:
+                self.D_BN1 = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
+                self.D_NN1 = nn.Linear(self.outputs, self.hiddenSizeDecode)
+                self.D_BN2 = nn.BatchNorm1d(num_features=self.hiddenSizeDecode, momentum=bn_momentum)
+                self.D_NN2 = nn.Linear(self.hiddenSizeDecode, self.inH*self.inW*self.inChannels)
+            else:
+                self.D_BN1 = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
+                self.D_NN1 = nn.Linear(self.outputs, self.inH*self.inW*self.inChannels)
 
     def forward(self, x):
         x = self.Encode(x)
@@ -729,25 +773,32 @@ class CNN_AE_1(nn.Module):
         x = x.view(samples, -1)
         if self.hiddenSizeDecode!=None:
             x = self.MyActivation(self.FC1(self.BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
-            x = self.MyActivation(self.FC2(self.BN2(F.dropout(x, p=self.dropoutRate, training=self.training))))
+            x = torch.sigmoid(self.FC2(self.BN2(F.dropout(x, p=self.dropoutRate, training=self.training))))
         else:
-            x = self.MyActivation(self.FC1(self.BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
+            x = torch.sigmoid(self.FC1(self.BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
         return x
 
     def Decode(self, x):
         samples = x.size(0) 
-        if self.hiddenSizeDecode!=None:
-            x = self.MyActivation(self.D_NN1(self.D_BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
-            x = self.MyActivation(self.D_NN2(self.D_BN2(F.dropout(x, p=self.dropoutRate, training=self.training))))
-            x = x.view([samples, self.inChannels, self.inHW, self.inHW])
+        if self.useConvTranspose:
+            x = self.MyActivation(self.D_NN_T(self.D_BN_T(F.dropout(x, p=self.dropoutRate, training=self.training))))
+            x = x.view([samples, self.cnnChannels2, round(self.inH/4), round(self.inW/4)]) if self.cnn_Dim==1 else x.view([samples, self.cnnChannels2, round(self.inW/4)])
+            x = self.CNN_T(x)
         else:
-            x = self.MyActivation(self.D_NN1(self.D_BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
-            x = x.view([samples, self.inChannels, self.inHW, self.inHW])
+            if self.hiddenSizeDecode!=None:
+                x = self.MyActivation(self.D_NN1(self.D_BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
+                x = self.MyActivation(self.D_NN2(self.D_BN2(F.dropout(x, p=self.dropoutRate, training=self.training))))
+                x = x.view([samples, self.inChannels, self.inH, self.inW]) if self.cnn_Dim==1 else x.view([samples, self.inChannels, self.inW])
+            else:
+                x = self.MyActivation(self.D_NN1(self.D_BN1(F.dropout(x, p=self.dropoutRate, training=self.training))))
+                x = x.view([samples, self.inChannels, self.inH, self.inW]) if self.cnn_Dim==1 else x.view([samples, self.inChannels, self.inW])
         return x 
     
     def PreProcess(self, x, returnTorch=False):
         self.eval()
-        while len(x.shape)<4:
+        torch.no_grad() #https://discuss.pytorch.org/t/model-eval-vs-with-torch-no-grad/19615/8
+        dimsNeeded = 4 if self.cnn_Dim==1 else 3
+        while len(x.shape)<dimsNeeded:
             x = np.expand_dims(x, axis=0)
         x = torch.from_numpy(x).float().to('cpu')
         x = self.Encode(x)
@@ -760,7 +811,9 @@ class CNN_AE_1(nn.Module):
 
     def EncodeDecode(self, x, returnTorch=False):
         self.eval()
-        while len(x.shape)<4:
+        torch.no_grad() #https://discuss.pytorch.org/t/model-eval-vs-with-torch-no-grad/19615/8
+        dimsNeeded = 4 if self.cnn_Dim==1 else 3
+        while len(x.shape)<dimsNeeded:
             x = np.expand_dims(x, axis=0)
         x = torch.from_numpy(x).float().to('cpu')
         x = self.forward(x)

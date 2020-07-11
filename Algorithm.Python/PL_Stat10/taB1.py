@@ -429,77 +429,81 @@ class MyGASF():
         
     #FEATURE EXTRACTOR
     #   For Simulation Stats use useGASF=False, picleFeatures=True
-    def FeatureExtractor(self, n=None, featureType="Close", useGAP=True, useGASF=True, picleFeatures=False, useFloat32=True, intCode=None, preProcessor=None):
+    def FeatureExtractor(self, n=None, featureType="Close", useGASF=False, useFloat32=True, intCode=None, preProcessor=None, picleFeatures=False, returnList=False):
+        # Slicing to be after Norm() to preserve spatial context 
         n = min(n, len(self.myBars)) if n!=None else len(self.myBars)
         
         if featureType == "Close":
             #Normaized Close only 
-            Features = self.Norm(np.array([bar.Close for bar in self.myBars])[0:n])
+            Features = self.Norm(np.array([bar.Close for bar in self.myBars]))[0:n]
         
         elif featureType == "OHLC":
-            #OHLC
-            _O = np.array([bar.Open for bar in self.myBars])[0:n]
-            _H = np.array([bar.High for bar in self.myBars])[0:n]
-            _L = np.array([bar.Low for bar in self.myBars])[0:n]
-            _C = np.array([bar.Close for bar in self.myBars])[0:n]
-            Features = self.Norm(np.vstack((_O, _H, _L, _C)))
+            _O = np.array([bar.Open for bar in self.myBars])
+            _H = np.array([bar.High for bar in self.myBars])
+            _L = np.array([bar.Low for bar in self.myBars])
+            _C = np.array([bar.Close for bar in self.myBars])
+            Features = self.Norm(np.vstack((_O, _H, _L, _C)))[:,0:n]
         
-        elif featureType in ["ULBG", "_U", "_L", "_B", "_G"]:
+        elif featureType in ["ULBG", "ULB", "_U", "_L", "_B", "_G"]:
             #Close (if "CULBG"), Upper shadow, Lower shadow, Body, Gap
-            _C = np.array([bar.Close for bar in self.myBars])[0:n]
-            _U = np.array([bar.High-bar.Close if bar.Close>bar.Open else bar.High-bar.Open for bar in self.myBars])[0:n]
-            _L = np.array([bar.Open-bar.Low if bar.Close>bar.Open else bar.Close-bar.Low for bar in self.myBars])[0:n]
-            _B = np.array([bar.Close-bar.Open for bar in self.myBars])[0:n]
+            _C = np.array([bar.Close for bar in self.myBars])
+            _U = np.array([bar.High-bar.Close if bar.Close>bar.Open else bar.High-bar.Open for bar in self.myBars])
+            _L = np.array([bar.Open-bar.Low if bar.Close>bar.Open else bar.Close-bar.Low for bar in self.myBars])
+            _B = np.array([bar.Close-bar.Open for bar in self.myBars])
             _C_t1 = np.roll(_C, shift=-1, axis = 0) 
-            _G = np.array([bar.Open for bar in self.myBars])[0:n]-_C_t1
+            _G = np.array([bar.Open for bar in self.myBars])-_C_t1
             _G[len(_G)-1] = 0   #this creates a 0 gap at [len-1] as we don't know what the gap was there
 
             if featureType == "ULBG": 
-                Features = self.Norm(np.vstack((_U, _L, _B, _G))) if useGAP else self.Norm(np.vstack((_U, _L, _B)))
+                Features = self.Norm(np.vstack((_U, _L, _B, _G)))[:,0:n]
+            elif featureType == "ULB": 
+                Features = self.Norm(np.vstack((_U, _L, _B)))[:,0:n]
             elif featureType == "_U":
-                Features = self.Norm(_U)
+                Features = self.Norm(_U)[0:n]
             elif featureType == "_L":
-                Features = self.Norm(_L)
+                Features = self.Norm(_L)[0:n]
             elif featureType == "_B":
-                Features = self.Norm(_B)
+                Features = self.Norm(_B)[0:n]
             elif featureType == "_G":
-                Features = self.Norm(_G)
+                Features = self.Norm(_G)[0:n]
 
         elif featureType == "ULRange":
             #Normalized Upper and Lower Range
-            _UR = np.array([bar.High-bar.Close for bar in self.myBars])[0:n]
-            _LR = np.array([bar.Close-bar.Low for bar in self.myBars])[0:n]
-            Features = self.Norm(np.vstack((_UR, _LR)))
+            _UR = np.array([bar.High-bar.Close for bar in self.myBars])
+            _LR = np.array([bar.Close-bar.Low for bar in self.myBars])
+            Features = self.Norm(np.vstack((_UR, _LR)))[:,0:n]
 
         elif featureType == "ULRG":
             #Normalized Upper and Lower Range and Gap
-            _UR = np.array([bar.High-bar.Close for bar in self.myBars])[0:n]
-            _LR = np.array([bar.Close-bar.Low for bar in self.myBars])[0:n]
-            _C = np.array([bar.Close for bar in self.myBars])[0:n]
+            _UR = np.array([bar.High-bar.Close for bar in self.myBars])
+            _LR = np.array([bar.Close-bar.Low for bar in self.myBars])
+            _C = np.array([bar.Close for bar in self.myBars])
             _C_t1 = np.roll(_C, shift=-1, axis = 0) 
-            _G = np.array([bar.Open for bar in self.myBars])[0:n]-_C_t1
+            _G = np.array([bar.Open for bar in self.myBars])-_C_t1
             _G[len(_G)-1] = 0   #this creates a 0 gap at [len-1] as we don't know what the gap was there
-            Features = self.Norm(np.vstack((_UR, _LR, _G)))
+            Features = self.Norm(np.vstack((_UR, _LR, _G)))[:,0:n]
 
         elif featureType == "RelativePrice":
-            Features = self.Norm(np.array(self.relativeClose)[0:n])
+            Features = self.Norm(np.array(self.relativeClose))[0:n]
         
         elif featureType == "Volume" and hasattr(self.myBars[0], 'Volume'):
-            Features = self.Norm(np.array([bar.Volume for bar in self.myBars])[0:n])
+            Features = self.Norm(np.array([bar.Volume for bar in self.myBars]))[0:n]
         
         elif featureType == "Volatility":
-            Features = self.Norm(np.array(self.volatility)[0:n])
+            Features = self.Norm(np.array(self.volatility))[0:n]
         
         # in case of vectors (time series only) one extra dim as channel=1 added during gasf so output also is in (1, ch, n, n) format
-        #   if no gasf is used only pickled, numpy time series as vectors or OHLC stacked to matrix is pickled
+        #   if no gasf is used only pickled, numpy time series as vectors or OHLC like stacked to matrix is pickled
         if useGASF: Features = self.GASF_Transform(Features, positiveNormalize=True)
         if useFloat32: Features = Features.astype(np.single)
         if intCode!=None: Features = self.IntCoding(Features, encodeType=intCode)
         if preProcessor!=None: 
-            if len(Features)==1:
-                #add 1 extra dim as cnn needs channels even if it is 1
+            if len(Features.shape)==1:
+                #add 1 extra dim as cnn needs channels even if it is 1 (in PreProcess this is handled anyway)
                 Features = np.expand_dims(Features, axis=0)
             Features = preProcessor.PreProcess(Features)
         if picleFeatures: Features = codecs.encode(pickle.dumps(Features, protocol= pickle.HIGHEST_PROTOCOL), "base64").decode()
-        
-        return Features
+        if not picleFeatures and returnList: 
+            return np.reshape(Features, -1).tolist()
+        else:
+            return Features
