@@ -28,8 +28,8 @@ class MySIMPosition():
     rawClosedPositionsData = [] #list of completed positionData lists
     hasPosition=False
     useHeader=True
-    statFolder="X:\\My Drive\\QCStats\\Stat12\\Stat-2005_2019-Eq-Sig_All\\"
-    subStatName="Test" #.csv statFile filename starts with it
+    statFolder="X:\\My Drive\\QCStats\\Stat12\\Stat-2005_2019-Eq-Sig_Sel\\"
+    subStatName="S1" #.csv statFile filename starts with it
     saveFiles = [] #List of lists or tuples (filePath, fileName)
     simsOpened = 0
     simsClosed = 0
@@ -82,7 +82,9 @@ class MySIMPosition():
         return btTime
 
 
-    def __init__(self, symbolStrat, direction, timestamp, signal, features, simTradeTypes=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], simMinMaxTypes=[0,1,2,3], openUntil=datetime(2168, 6, 25, 15, 55), dataConsolidated=None):
+    def __init__(self, symbolStrat, direction, timestamp, signal, features, \
+                    simTradeTypes=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], simMinMaxTypes=[0,1,2,3],  MinMaxNormMethod=["atr", "pct"][0], \
+                    openUntil=datetime(2168, 6, 25, 15, 55), dataConsolidated=None):
         self.CL = self.__class__
         self.symbolStrat = symbolStrat
         self.algo = self.symbolStrat.algo
@@ -467,28 +469,28 @@ class MySIMPosition():
             if 0 in simMinMaxTypes:
                 mmPeriod=7
                 if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(minMaxNo)+"_P", str(minMaxNo)+"_Min", str(minMaxNo)+"_Max"))
-                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod)
+                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod, normMethod=MinMaxNormMethod)
                 self.positionData.extend(singleMinMaxOutput)
                 minMaxNo+=1
             #Minmax_2
             if 1 in simMinMaxTypes:
                 mmPeriod=15
                 if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(minMaxNo)+"_P", str(minMaxNo)+"_Min", str(minMaxNo)+"_Max"))
-                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod)
+                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod, normMethod=MinMaxNormMethod)
                 self.positionData.extend(singleMinMaxOutput)
                 minMaxNo+=1
             #Minmax_3
             if 2 in simMinMaxTypes:
                 mmPeriod=35
                 if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(minMaxNo)+"_P", str(minMaxNo)+"_Min", str(minMaxNo)+"_Max"))
-                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod)
+                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod, normMethod=MinMaxNormMethod)
                 self.positionData.extend(singleMinMaxOutput)
                 minMaxNo+=1        
             #Minmax_4
             if 3 in simMinMaxTypes:
                 mmPeriod=70
                 if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(minMaxNo)+"_P", str(minMaxNo)+"_Min", str(minMaxNo)+"_Max"))
-                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod)
+                newPriceMinMax = MyPriceMinMax(self, len(self.positionData), entryPrice=self.entryPrice, period=mmPeriod, normMethod=MinMaxNormMethod)
                 self.positionData.extend(singleMinMaxOutput)
                 minMaxNo+=1     
 
@@ -687,7 +689,7 @@ class MySIMOrder():
 Price Min Max on the given period
 '''  
 class MyPriceMinMax():
-    def __init__(self, position, index, entryPrice, period):
+    def __init__(self, position, index, entryPrice, period, normMethod):
         self.position = position
         self.index = index #self.positionData index where the trade results to be put 
         self.entryPrice = entryPrice
@@ -696,7 +698,8 @@ class MyPriceMinMax():
         self.period = period
         self.currentPeriod = 1
         self.atr =  self.position.symbolStrat.atr1.Current.Value
-        self.normalizer=5
+        self.normMethod = normMethod
+        self.normalizer = 5 if self.normMethod=="atr" else 0.01
         self.isClosed= False
         
         self.position.openPriceMinMaxes.append(self)
@@ -711,10 +714,16 @@ class MyPriceMinMax():
         self.priceMax = max(self.priceMax, bar.High)
         #Close it if this is the period
         if self.currentPeriod == self.period:
-            if self.atr!=0:
-                self.position.positionData[self.index  ] = (bar.Close-self.entryPrice)/self.atr/self.normalizer
-                self.position.positionData[self.index+1] = (self.priceMin-self.entryPrice)/self.atr/self.normalizer
-                self.position.positionData[self.index+2] = (self.priceMax-self.entryPrice)/self.atr/self.normalizer
+            if self.normMethod=="atr" and self.atr!=0:
+                norm = self.atr*self.normalizer
+            elif self.normMethod=="pct":
+                norm = bar.Close*self.normalizer
+            else:
+                norm = 100
+            self.position.positionData[self.index  ] = (bar.Close-self.entryPrice)/norm
+            self.position.positionData[self.index+1] = (self.priceMin-self.entryPrice)/norm
+            self.position.positionData[self.index+2] = (self.priceMax-self.entryPrice)/norm
+            
             self.position.openPriceMinMaxes.remove(self)
             self.isClosed = True
             self.position.dataConsolidated -= self.Update

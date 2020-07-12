@@ -118,8 +118,8 @@ class Eq2_ai_4():
     #Pi NoETF ALL
     #myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ", "BKNG", "BLK", "BOX", "BP", "BRK-B", "BSX", "BTU", "BURL", "BX", "BYND", "C", "CAKE", "CARS", "CBOE", "CCJ", "CDLX", "CELG", "CHK", "CHWY", "CIEN", "CLDR", "CLF", "CLNE", "CMCSA", "CME", "CMG", "CMI", "CNDT", "COP", "COST", "COUP", "CPB", "CREE", "CRM", "CRSP", "CRUS", "CRWD", "CSX", "CTRP", "CTSH", "CVS", "DBI", "DBX", "DD", "DE", "DECK", "DELL", "DG", "DKS", "DLTR", "DNKN", "DNN", "DO", "DOCU", "DRYS", "DT", "DUK", "EA", "EBAY", "ELAN", "EOG", "EQT", "ESTC", "ET", "ETFC", "ETRN", "ETSY", "EXC", "F", "FANG", "FB", "FCX", "FDX", "FEYE", "FISV", "FIT", "FIVE", "FLR", "FLT", "FMCC", "FNMA", "FSCT", "FSLR", "FTCH", "GDDY", "GE", "GH", "GLBR", "GLW", "GM", "GME", "GNRC", "GOLD", "GOOGL", "GOOS", "GPRO", "GPS", "GRPN", "GRUB", "GSK", "GSKY", "HAL", "HCA", "HCAT", "HIG", "HLF", "HLT", "HOG", "HON", "HPE", "HPQ", "HRI", "HTZ", "IBKR", "ICE", "INFO", "INMD", "IQ", "IQV", "ISRG", "JBLU", "JCP", "JMIA", "JNPR", "KBR", "KLAC", "KMI", "KMX", "KNX", "KSS", "LC", "LEVI", "LHCG", "LLY", "LN", "LOW", "LULU", "LVS", "LYFT", "MA", "MDLZ", "MDR", "MGM", "MLCO", "MNK", "MO", "MOMO", "MRNA", "MRVL", "MS", "MSI", "MU", "MXIM", "NAVI", "NEM", "NET", "NFLX", "NIO", "NOK", "NOV", "NOW", "NTNX", "NTR", "NUAN", "NUE", "NVDA", "NVR", "NVS", "NWSA", "NXPI", "OAS", "OKTA", "OPRA", "ORCL", "OXY", "PANW", "PAYX", "PBR", "PCG", "PDD", "PE", "PEP", "PHM", "PINS", "PIR", "PM", "PRGO", "PS", "PSTG", "PTON", "PVTL", "PYPL", "QCOM", "QRTEA", "QRVO", "RACE", "RAD", "REEMF", "RGR", "RIG", "RIO", "RMBS", "ROKU", "RRC", "S", "SAVE", "SBUX", "SCCO", "SCHW", "SD", "SDC", "SHAK", "SHLDQ", "SHOP", "SINA", "SIRI", "SLB", "SNAP", "SOHU", "SONO", "SPLK", "SPOT", "SQ", "STNE", "STX", "SU", "SWAV", "SWCH", "SWI", "SWN", "SYMC", "T", "TAL", "TDC", "TEVA", "TGT", "TIF", "TLRY", "TM", "TME", "TOL", "TPR", "TPTX", "TRU", "TRUE", "TSLA", "TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA"]
     #Lean noETFs SLICE_n (41)
-    #myTickers = ["TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA", "ZS", "ZUO"]
-    myTickers =["A", "AA"]
+    myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ"]
+    #myTickers =["A", "AA"]
 
     #ES&NQ (181)
     #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DHR", "DIS", "DOW", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM", "ATVI", "AMD", "ALXN", "ALGN", "AAL", "ADI", "AMAT", "ASML", "ADSK", "ADP", "BIDU", "BMRN", "AVGO", "CDNS", "CERN", "CHKP", "CTAS", "CTXS", "CTSH", "CSX", "CTRP", "DLTR", "EBAY", "EA", "EXPE", "FAST", "FISV", "FOX", "FOXA", "HAS", "HSIC", "IDXX", "ILMN", "INCY", "INTU", "ISRG", "JBHT", "JD", "KLAC", "LRCX", "LBTYA", "LBTYK", "LULU", "MAR", "MXIM", "MELI", "MCHP", "MU", "MNST", "MYL", "NTAP", "NTES", "NXPI", "ORLY", "PCAR", "PAYX", "REGN", "ROST", "SIRI", "SWKS", "SYMC", "SNPS", "TMUS", "TTWO", "TSLA", "ULTA", "UAL", "VRSN", "VRSK", "VRTX", "WDAY", "WDC", "WLTW", "WYNN", "XEL", "XLNX", "STX", "TSLA", "VRSK", "WYNN", "XLNX"]
@@ -151,13 +151,15 @@ class Eq2_ai_4():
   
     
  #Simulation Signals [direction, disableBars, Enabled, signalDisabledBars]
+    simALL=False
     simDict = {
-       "ALL_L": [1,len(myTickers),True,0], "ALL_S": [-1,len(myTickers),True,0],
-       "L_Str_": [1,8,False,0], "S_Str_": [-1,8,False,0], 
-       "L_Rej_": [1,8,False,0], "S_Rej_": [-1,8,False,0],
-       "DB_": [1,8,False,0], "DT_": [-1,8,False,0], 
-       "TB_": [1,8,False,0], "TT_": [-1,8,False,0],
-       "IHS_": [1,8,False,0], "HS_": [-1,8,False,0]}
+       "ALL_L": [1,len(myTickers),simALL,0], "ALL_S": [-1,len(myTickers),simALL,0],
+       "L_Str_": [1,8,not simALL,0], "S_Str_": [-1,8,not simALL,0], 
+       "L_Rej_": [1,8,not simALL,0], "S_Rej_": [-1,8,not simALL,0],
+       "L_BPA_": [1,8,not simALL,0], "S_BPA_": [-1,8,not simALL,0], 
+       "DB_": [1,8,not simALL,0], "DT_": [-1,8,not simALL,0], 
+       "TB_": [1,8,not simALL,0], "TT_": [-1,8,not simALL,0],
+       "IHS_": [1,8,not simALL,0], "HS_": [-1,8,not simALL,0]}
     
     exitSignalDict = {
        "L_Str_": 0, 
@@ -264,19 +266,19 @@ class Eq2_ai_4():
         
         self.dch_s = DonchianChannel(3)
         self.algo.RegisterIndicator(self.symbol, self.dch_s, self.consolidator)
-        self.dch0 = DonchianChannel(4)
+        self.dch0 = DonchianChannel(1)
         self.algo.RegisterIndicator(self.symbol, self.dch0, self.consolidator)
-        self.dch01 = DonchianChannel(7)
+        self.dch01 = DonchianChannel(4)
         self.algo.RegisterIndicator(self.symbol, self.dch01, self.consolidator)
-        self.dch02 = DonchianChannel(20)
+        self.dch02 = DonchianChannel(8)
         self.algo.RegisterIndicator(self.symbol, self.dch02, self.consolidator)
-        self.dch1 = DonchianChannel(35)
+        self.dch1 = DonchianChannel(16)
         self.algo.RegisterIndicator(self.symbol, self.dch1, self.consolidator)
-        self.dch2 = DonchianChannel(70)
+        self.dch2 = DonchianChannel(35)
         self.algo.RegisterIndicator(self.symbol, self.dch2, self.consolidator)
-        self.dch3 = DonchianChannel(280)
+        self.dch3 = DonchianChannel(70)
         self.algo.RegisterIndicator(self.symbol, self.dch3, self.consolidator)
-        self.dch4 = DonchianChannel(420)
+        self.dch4 = DonchianChannel(140)
         self.algo.RegisterIndicator(self.symbol, self.dch4, self.consolidator)
 
         self.vol = MyVolatility(self, self.algo, self.symbol, name='vol', period=200, atr=self.atr1)
@@ -535,17 +537,17 @@ class Eq2_ai_4():
             myFeatures = self.rawFeatures1
         self.longSimDisabledBars=max(self.longSimDisabledBars-1,0)
         self.shortSimDisabledBars=max(self.shortSimDisabledBars-1,0)
-        simTradeTypes = [0,2] #[0,2,3,4,7,8,10] #[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] 
-        simMinMaxTypes = [0,1] #[0,1,2,3]
+        simTradeTypes = [[0,2], [0,2,3,4,7,8,10,14], [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]][1]
+        simMinMaxTypes = [[0,1], [0,1,2,3]][1]
         lastEntryDate = datetime(year = 3019, month = 10, day = 7)
         if self.CL.simulate and self.posEnabled and longTriggerSim and (self.algo.Time<self.algo.simEndDate or self.algo.simEndDate==None):
             if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Long: {self.signals}')
-            sim = MySIMPosition(self, direction=1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes)
+            sim = MySIMPosition(self, direction=1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes, MinMaxNormMethod="pct")
             #use 0 if signalspecific
             self.longSimDisabledBars=0
         if self.CL.simulate and self.posEnabled and shortTriggerSim and (self.algo.Time<self.algo.simEndDate or self.algo.simEndDate==None):
             if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Short: {self.signals}')
-            sim = MySIMPosition(self, direction=-1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes) 
+            sim = MySIMPosition(self, direction=-1, timestamp=self.algo.Time.strftime("%Y%m%d %H:%M"), signal=self.signals, features=myFeatures, simTradeTypes=simTradeTypes, simMinMaxTypes=simMinMaxTypes, MinMaxNormMethod="pct") 
             #use 0 if signalspecific
             self.shortSimDisabledBars=0
         
