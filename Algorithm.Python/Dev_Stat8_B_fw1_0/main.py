@@ -28,23 +28,22 @@ from QuantConnect.Orders.Fills import *
 from QuantConnect.Brokerages import  BrokerageName
 from QuantConnect import Resolution, SecurityType
 
-import pandas as pd
-import numpy as np
-import random
+from System.Drawing import Color
 from datetime import datetime, timedelta
 import time
-from System.Drawing import Color
-import decimal as d
+import pandas as pd
+import numpy as np
 import math
+import random
+import decimal as d
 
-from pm3 import MyPositionManager
-from pmB3 import MyPositionManagerB
-from var31 import MyVaR, MyCharts, MyStats
-import hp3
-from eq2_ai_4 import Eq2_ai_4
+from pm import MyPositionManager
+from pmB import MyPositionManagerB
+from var import MyVaR, MyCharts, MyStats
+import hp
+from sim import MySIMPosition
 
-
-from sim1 import MySIMPosition
+from eq_st8_b import Eq_St8_B
 
 class MyAlgo(QCAlgorithm):
     '''
@@ -57,13 +56,13 @@ class MyAlgo(QCAlgorithm):
         self.twsSynced = False
         self.updateSettings = True if self.LiveMode else False
         self.settingsURL = 'https://www.dropbox.com/s/thxemetfxuisl27/QCStrategySettings.csv?dl=1'
-        self.strategySettings = hp3.MyStrategySettings(self)
+        self.strategySettings = hp.MyStrategySettings(self)
         '''DEBUG/LOG'''
         self.debug = False
         self.log = 0 #0) only Debug 1) Debug anf Log 2) only Log
         self.debugOrderFill = False #self.debug
         if self.LiveMode: self.debugOrderFill = True
-        self.myHelpers = hp3.MyHelpers(self)
+        self.myHelpers = hp.MyHelpers(self)
                 
         '''DATA STORAGE'''
         self.myStrategyClassList = []
@@ -86,7 +85,7 @@ class MyAlgo(QCAlgorithm):
         self.SetBrokerageModel(BrokerageName.InteractiveBrokersBrokerage, AccountType.Margin)
 
         '''STARTEGIES (First would inlude benchmark)'''
-        self.myHelpers.InstallStrategy(Eq2_ai_4, myAllocation=1.00*0.01)
+        self.myHelpers.InstallStrategy(Eq_St8_B, myAllocation=1.00)
 
         '''BACKTEST DATES and SETTINGS'''
         #Start Date
@@ -114,10 +113,11 @@ class MyAlgo(QCAlgorithm):
         #self.SetEndDate(2012,12,31)
         #self.SetEndDate(2015,6,24)
         #self.SetEndDate(datetime.now())
-        #self.SetEndDate(2019,10,10) #Last PiData Date
+        #self.SetEndDate(2019,10,11) #Last PiData Date
         self.simYears = 20
         self.simEndDate = datetime(self.simStartYear+self.simYears, 1, 1, 0, 0) #Use None if not applicable
         self.SetEndDate(min(self.simEndDate + timedelta(days=30), datetime(2019,10,10)))
+        self.SetEndDate(datetime.now())
         
         #self.Portfolio.SetAccountCurrency("EUR")
         self.SetCash(100000)
@@ -130,7 +130,10 @@ class MyAlgo(QCAlgorithm):
         self.SetWarmUp(self.myHelpers.WarUpDays()) 
         
         #Add chartSymbol and Set Tradable Property!
-        self.chartTicker = "DIA" #"QQQ"
+        if environment=="Lean":
+            self.chartTicker = "SPY"
+        else:
+            self.chartTicker = "VOO" #VOO: Vanguard S&P 500 ETF
         self.AddEquity(self.chartTicker, self.mainResolution)
         self.chartSymbol = self.Securities[self.chartTicker].Symbol 
         self.Securities[self.chartSymbol].SetDataNormalizationMode(self.myDataNormalizationMode)

@@ -6,24 +6,22 @@ from QuantConnect.Indicators import RollingWindow, ExponentialMovingAverage, Sim
 from QuantConnect.Data.Consolidators import TradeBarConsolidator, QuoteBarConsolidator
 from QuantConnect.Data.Market import IBaseDataBar, TradeBar
 
+import re
 from datetime import datetime, timedelta, date
-from ta1 import MyRelativePrice, MyPriceNormaliser, MyZigZag, MyDCHState, MyMAState, MySupportResistance, MyPatterns, MyVolatility
-from taB1 import MyBarStrength, MyBarRejection, MyBPA, MyGASF
-from sim1 import MySIMPosition
-#from m_pt1 import NN_1
-
-import hp3
 from pandas import DataFrame
 import numpy as np
-import re
+import random
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-import random
+from ta import MyRelativePrice, MyZigZag, MyDCHState, MyMAState, MySupportResistance, MyPatterns, MyVolatility
+from taB import MyBarStrength, MyBarRejection, MyBPA, MyGASF
+from sim import MySIMPosition
+import hp
 
-class Eq2_ai_4():
+class Eq_St8_B():
     file = __file__
     '''
     Strategy Implementation
@@ -50,8 +48,10 @@ class Eq2_ai_4():
     barPeriod_2 =  timedelta(minutes=resolutionMinutes_2)
     if isEquity:
         warmupcalendardays = max( round(7/5*maxWarmUpPeriod/(7*(60/min(resolutionMinutes,60*7) ))), round(7/5*maxWarmUpPeriod_2/(7*(60/min(resolutionMinutes_2,60*7) ))) )
+        lastTradeHour = 15
     else:
         warmupcalendardays = max(round(7/5*maxWarmUpPeriod/(24*(60/resolutionMinutes))), round(7/5*maxWarmUpPeriod_2/(24*(60/resolutionMinutes_2))))
+        lastTradeHour = 24
     #Switches
     plotIndicators = False
     #Risk Management
@@ -67,7 +67,7 @@ class Eq2_ai_4():
     riskperShortTrade = 0.50/100 
     maxLongVaR  = 5.0/100 
     maxShortVaR = 5.0/100 
-    maxTotalVaR = 0.100
+    maxTotalVaR = 10.0/100
     mainVaRr = None #it is set by the first instance
     #Entry
     enableLong  = False
@@ -76,7 +76,7 @@ class Eq2_ai_4():
     liquidateShort = False
     enableFlipLong  = True #Checked in self.algo.myPositionManager.EnterPosition_2
     enableFlipShort = True
-    closeOnTriggerLong  = True #works if Flip is didabled
+    closeOnTriggerLong  = True #works if Flip is disabled
     closeOnTriggerShort = True 
     entryLimitOrderLong  = True  #If False: enter the position with Market Order
     entryLimitOrderShort = True
@@ -85,20 +85,18 @@ class Eq2_ai_4():
     entryTimeInForceLong = timedelta(minutes=5*60)
     entryTimeInForceShort = timedelta(minutes=5*60)
     #Orders
-    useTragetsLong  = True #TWS Sync is not ready yet to handle useTragets for Foreign Symbols
-    useTragetsShort = True
-    stopPlacerLong  = 0    #0)dch0 1)dch1 2)dch2) 3)dch3 4)minStopATR 5)bars_rw[0] 6)bars_rw[0-1] 7)dc01 8)dch02 else: dch1
-    stopPlacerShort = 0
-    targetPlacerLong  = 1    #1)max(dch2,minPayoff) 2)max(dch3,minPayoff)  else: minPayoff 
-    targetPlacerShort = 1    
-    minPayOffLong  = 1.75
-    minPayOffShort = 1.75
+    stopPlacerLong  =   [("minStop"), ("dch", 'dch01'), ("rw",7)][2]     # Tuple (Type, arg2, arg2...)
+    stopPlacerShort =   [("minStop"), ("dch", 'dch01'), ("rw",7)][1] 
+    targetPlacerLong  = [(None,0), ("minPayOff",0), ("dch", 'dch2'), ("rw",70)][3]  # Tuple (Type, arg2, arg2...) If targetPlacer[0]!=None then customPositionSettings['targetPlacer']==None must raise an exeption during installation otherwise _UT would become inconsistent
+    targetPlacerShort = [(None,0), ("minPayOff",0), ("dch", 'dch2'), ("rw",70)][2]  # TWS Sync is not ready yet to handle useTragets for Foreign Symbols  
+    minPayOffLong  = 2.00
+    minPayOffShort = 1.50
     scratchTradeLong  = True 
     scratchTradeShort = True 
-    stopTrailerLong  = 0 #0) no Trail 1)dhc2 2)dch3 3)dch1 4)dch0
-    stopTrailerShort = 0 
-    targetTrailerLong  = 0 #0) no Trail 1)dhc2 
-    targetTrailerShort = 0 
+    stopTrailerLong  =  [(None,0), ("dch", 'dch01'), ("rw",15)][0]      # Tuple (Type, arg2, arg2...): (None,0), ("dch",'dch_attributeName'), ("rw",n)
+    stopTrailerShort =  [(None,0), ("dch", 'dch01'), ("rw",5)][0] 
+    targetTrailerLong  = [(None,0), ("dch", 'dch2'), ("rw",5)][0]       # Tuple (Type, arg2, arg2...): (None,0), ("dch",'dch_attributeName'), ("rw",n)
+    targetTrailerShort = [(None,0), ("dch", 'dch2'), ("rw",5)][0] 
     stopATRLong  = 0.5
     stopATRShort = 0.5
     minEntryStopATRLong  = 2.0    
@@ -115,12 +113,10 @@ class Eq2_ai_4():
     _totalATRpct = 0
     _lastUpdated = datetime(year = 1968, month = 6, day = 25)
     
-    #Pi NoETF ALL
-    #myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ", "BKNG", "BLK", "BOX", "BP", "BRK-B", "BSX", "BTU", "BURL", "BX", "BYND", "C", "CAKE", "CARS", "CBOE", "CCJ", "CDLX", "CELG", "CHK", "CHWY", "CIEN", "CLDR", "CLF", "CLNE", "CMCSA", "CME", "CMG", "CMI", "CNDT", "COP", "COST", "COUP", "CPB", "CREE", "CRM", "CRSP", "CRUS", "CRWD", "CSX", "CTRP", "CTSH", "CVS", "DBI", "DBX", "DD", "DE", "DECK", "DELL", "DG", "DKS", "DLTR", "DNKN", "DNN", "DO", "DOCU", "DRYS", "DT", "DUK", "EA", "EBAY", "ELAN", "EOG", "EQT", "ESTC", "ET", "ETFC", "ETRN", "ETSY", "EXC", "F", "FANG", "FB", "FCX", "FDX", "FEYE", "FISV", "FIT", "FIVE", "FLR", "FLT", "FMCC", "FNMA", "FSCT", "FSLR", "FTCH", "GDDY", "GE", "GH", "GLBR", "GLW", "GM", "GME", "GNRC", "GOLD", "GOOGL", "GOOS", "GPRO", "GPS", "GRPN", "GRUB", "GSK", "GSKY", "HAL", "HCA", "HCAT", "HIG", "HLF", "HLT", "HOG", "HON", "HPE", "HPQ", "HRI", "HTZ", "IBKR", "ICE", "INFO", "INMD", "IQ", "IQV", "ISRG", "JBLU", "JCP", "JMIA", "JNPR", "KBR", "KLAC", "KMI", "KMX", "KNX", "KSS", "LC", "LEVI", "LHCG", "LLY", "LN", "LOW", "LULU", "LVS", "LYFT", "MA", "MDLZ", "MDR", "MGM", "MLCO", "MNK", "MO", "MOMO", "MRNA", "MRVL", "MS", "MSI", "MU", "MXIM", "NAVI", "NEM", "NET", "NFLX", "NIO", "NOK", "NOV", "NOW", "NTNX", "NTR", "NUAN", "NUE", "NVDA", "NVR", "NVS", "NWSA", "NXPI", "OAS", "OKTA", "OPRA", "ORCL", "OXY", "PANW", "PAYX", "PBR", "PCG", "PDD", "PE", "PEP", "PHM", "PINS", "PIR", "PM", "PRGO", "PS", "PSTG", "PTON", "PVTL", "PYPL", "QCOM", "QRTEA", "QRVO", "RACE", "RAD", "REEMF", "RGR", "RIG", "RIO", "RMBS", "ROKU", "RRC", "S", "SAVE", "SBUX", "SCCO", "SCHW", "SD", "SDC", "SHAK", "SHLDQ", "SHOP", "SINA", "SIRI", "SLB", "SNAP", "SOHU", "SONO", "SPLK", "SPOT", "SQ", "STNE", "STX", "SU", "SWAV", "SWCH", "SWI", "SWN", "SYMC", "T", "TAL", "TDC", "TEVA", "TGT", "TIF", "TLRY", "TM", "TME", "TOL", "TPR", "TPTX", "TRU", "TRUE", "TSLA", "TTD", "TW", "TWLO", "TWTR", "TXN", "UAA", "UBER", "UPS", "UPWK", "USFD", "UUUU", "VICI", "VLO", "VMW", "VRSN", "VVV", "W", "WB", "WDAY", "WDC", "WFC", "WFTIQ", "WHR", "WORK", "WYNN", "X", "YELP", "YETI", "YNDX", "YRD", "YUM", "YUMC", "ZAYO", "ZEUS", "ZG", "ZM", "ZNGA"]
-    #Lean noETFs SLICE_n (41)
-    myTickers = ["A", "AA", "AABA", "AAL", "AAXN", "ABBV", "ACIA", "ADM", "ADT", "AIG", "AKAM", "AKS", "ALLY", "ALTR", "AMAT", "AMC", "AMCX", "AMD", "AMGN", "AMZN", "AN", "ANF", "ANTM", "AOBC", "APO", "APRN", "ARLO", "ATUS", "ATVI", "AUY", "AVGO", "AVTR", "AWK", "BABA", "BAC", "BAH", "BB", "BBBY", "BBY", "BIDU", "BJ"]
     myTickers =["A", "AA"]
 
+    #SP100 (100)
+    #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DD", "DHR", "DIS", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM"]
     #ES&NQ (181)
     #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DHR", "DIS", "DOW", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM", "ATVI", "AMD", "ALXN", "ALGN", "AAL", "ADI", "AMAT", "ASML", "ADSK", "ADP", "BIDU", "BMRN", "AVGO", "CDNS", "CERN", "CHKP", "CTAS", "CTXS", "CTSH", "CSX", "CTRP", "DLTR", "EBAY", "EA", "EXPE", "FAST", "FISV", "FOX", "FOXA", "HAS", "HSIC", "IDXX", "ILMN", "INCY", "INTU", "ISRG", "JBHT", "JD", "KLAC", "LRCX", "LBTYA", "LBTYK", "LULU", "MAR", "MXIM", "MELI", "MCHP", "MU", "MNST", "MYL", "NTAP", "NTES", "NXPI", "ORLY", "PCAR", "PAYX", "REGN", "ROST", "SIRI", "SWKS", "SYMC", "SNPS", "TMUS", "TTWO", "TSLA", "ULTA", "UAL", "VRSN", "VRSK", "VRTX", "WDAY", "WDC", "WLTW", "WYNN", "XEL", "XLNX", "STX", "TSLA", "VRSK", "WYNN", "XLNX"]
     #ES&NQ SLICE_1 (90)
@@ -134,22 +130,11 @@ class Eq2_ai_4():
     #myTickers = ["XRAY", "CPB", "L", "TDG", "O", "FBHS", "RHI", "MAC", "CMS", "ANTM", "EQR", "KSU", "BR", "TFX", "CHD", "BBY", "XYL", "SJM", "HRL", "KEYS", "FTNT", "DAL", "A", "GRMN", "BXP", "GPC", "ROP", "WAB", "LIN", "BDX", "AMT", "SHW", "TSN", "NBL", "HUM", "ETN", "WRK", "FCX", "ETFC", "ES", "AEE", "HFC", "AME", "EXR", "EMN", "NUE", "LW", "CB", "LNT", "PPG", "NTRS", "HCA", "ARE", "HES", "DHI", "LEN", "MCO", "MKC", "KMB", "ZION", "EW", "MPC", "ETR", "FRC", "MTD", "EFX", "CLX", "UNM", "RE", "CPRI", "TMO", "DISH", "DRE", "KEY", "DVN", "PSA", "WCG", "MOS", "UHS", "PKI", "FANG", "URI", "CF", "AWK", "EIX", "MGM", "ICE", "LEG", "KIM", "CTL", "QRVO", "ALLE", "DE", "ZBH", "ED", "APA", "CE", "GL", "CBS", "DVA", "GPN", "EL", "ALK", "MSCI", "TXT", "PPL", "RMD", "CMG", "JWN", "COTY", "PNR", "DG", "KSS", "BF.B", "CNC"]
     #SP500-ES&NQ SLICE_2 (115)
     #myTickers = ["PKG", "SLG", "PFG", "AVY", "DTE", "FITB", "SYY", "MCK", "AFL", "AAP", "SNA", "HCP", "EXPD", "LNC", "CHRW", "OKE", "STT", "LUV", "IPGP", "TSS", "HOG", "VTR", "REG", "LYB", "VAR", "NCLH", "IP", "SBAC", "DXC", "TROW", "HP", "FLT", "HBAN", "PNW", "MLM", "NOV", "WU", "JKHY", "AIV", "GWW", "MTB", "HII", "CNP", "PVH", "AEP", "JEC", "PNC", "TRV", "MMC", "FMC", "RJF", "RCL", "HPQ", "HOLX", "IPG", "DGX", "ITW", "NDAQ", "KMX", "WHR", "PLD", "NWL", "TRIP", "NWSA", "ADS", "ROL", "APD", "COO", "NSC", "HIG", "ADM", "HBI", "IR", "EVRG", "MHK", "SRE", "JEF", "MAA", "CMI", "STI", "PBCT", "AON", "AJG", "LKQ", "STZ", "BSX", "EQIX", "ANSS", "TIF", "FIS", "SCHW", "CAG", "UA", "YUM", "ESS", "CXO", "BLL", "NEM", "SYF", "NKTR", "BEN", "SEE", "HAL", "PEG", "MRO", "AKAM", "VIAB", "RSG", "PRU", "TEL", "DLR", "CINF", "NI", "FRT", "VFC"]
+    #SP500-ES&NQ SLICE_3 (107)
+    #myTickers = ["CRM", "MSI", "INFO", "HSY", "OMC", "VMC", "BAX", "TJX", "EOG", "AMP", "MAS", "LH", "BHGE", "FLS", "K", "IEX", "ATO", "CI", "PXD", "NLSN", "ALB", "COG", "DOW", "CAH", "WM", "WMB", "AIZ", "HRB", "SPGI", "ABMD", "JCI", "AOS", "TAP", "JNPR", "IVZ", "ZTS", "WY", "LB", "AES", "PGR", "PHM", "FE", "VLO", "FLIR", "SIVB", "CMA", "WELL", "DISCK", "RF", "CBOE", "ROK", "CPRT", "PH", "GIS", "PWR", "HPE", "GLW", "BBT", "IFF", "IRM", "CCI", "DOV", "HLT", "NRG", "NWS", "UAA", "HST", "TPR", "XEC", "GPS", "CFG", "D", "PRGO", "WAT", "DISCA", "SYK", "CCL", "M", "FTI", "AZO", "IT", "LHX", "ANET", "TWTR", "ABC", "XRX", "FFIV", "NOC", "MKTX", "AVB", "AMG", "ECL", "KR", "UDR", "CME", "DRI", "WEC", "PSX", "SWK", "TSCO", "ARNC", "DFS", "VNO", "FTV", "APH", "LDOS", "APTV", "BWA"]
     #SP500-ES&NQ SLICE_1 and SLICE_2 (230) 
     #myTickers = ["XRAY", "CPB", "L", "TDG", "O", "FBHS", "RHI", "MAC", "CMS", "ANTM", "EQR", "KSU", "BR", "TFX", "CHD", "BBY", "XYL", "SJM", "HRL", "KEYS", "FTNT", "DAL", "A", "GRMN", "BXP", "GPC", "ROP", "WAB", "LIN", "BDX", "AMT", "SHW", "TSN", "NBL", "HUM", "ETN", "WRK", "FCX", "ETFC", "ES", "AEE", "HFC", "AME", "EXR", "EMN", "NUE", "LW", "CB", "LNT", "PPG", "NTRS", "HCA", "ARE", "HES", "DHI", "LEN", "MCO", "MKC", "KMB", "ZION", "EW", "MPC", "ETR", "FRC", "MTD", "EFX", "CLX", "UNM", "RE", "CPRI", "TMO", "DISH", "DRE", "KEY", "DVN", "PSA", "WCG", "MOS", "UHS", "PKI", "FANG", "URI", "CF", "AWK", "EIX", "MGM", "ICE", "LEG", "KIM", "CTL", "QRVO", "ALLE", "DE", "ZBH", "ED", "APA", "CE", "GL", "CBS", "DVA", "GPN", "EL", "ALK", "MSCI", "TXT", "PPL", "RMD", "CMG", "JWN", "COTY", "PNR", "DG", "KSS", "BF.B", "CNC", "PKG", "SLG", "PFG", "AVY", "DTE", "FITB", "SYY", "MCK", "AFL", "AAP", "SNA", "HCP", "EXPD", "LNC", "CHRW", "OKE", "STT", "LUV", "IPGP", "TSS", "HOG", "VTR", "REG", "LYB", "VAR", "NCLH", "IP", "SBAC", "DXC", "TROW", "HP", "FLT", "HBAN", "PNW", "MLM", "NOV", "WU", "JKHY", "AIV", "GWW", "MTB", "HII", "CNP", "PVH", "AEP", "JEC", "PNC", "TRV", "MMC", "FMC", "RJF", "RCL", "HPQ", "HOLX", "IPG", "DGX", "ITW", "NDAQ", "KMX", "WHR", "PLD", "NWL", "TRIP", "NWSA", "ADS", "ROL", "APD", "COO", "NSC", "HIG", "ADM", "HBI", "IR", "EVRG", "MHK", "SRE", "JEF", "MAA", "CMI", "STI", "PBCT", "AON", "AJG", "LKQ", "STZ", "BSX", "EQIX", "ANSS", "TIF", "FIS", "SCHW", "CAG", "UA", "YUM", "ESS", "CXO", "BLL", "NEM", "SYF", "NKTR", "BEN", "SEE", "HAL", "PEG", "MRO", "AKAM", "VIAB", "RSG", "PRU", "TEL", "DLR", "CINF", "NI", "FRT", "VFC"]
-       
-    #SP500-ES&NQ/100_1
-    #myTickers = ["FE", "AWK", "A", "CTVA", "HSY", "TSS", "GLW", "APTV", "CMI", "ETR", "PPL", "HIG", "PH", "ADM", "ESS", "FTV", "PXD", "LYB", "SYF", "CMG", "CLX", "SWK", "MTB", "MKC", "MSCI", "RMD", "BXP", "CHD", "AME", "WY", "RSG", "STT", "FITB", "KR", "CNC", "NTRS", "AEE", "VMC", "HPE", "KEYS", "ROK", "CMS", "RCL", "EFX", "ANSS", "CCL", "AMP", "CINF", "TFX", "ARE", "OMC", "HCP", "DHI", "LH", "KEY", "AJG", "MTD", "COO", "CBRE", "HAL", "EVRG", "AMCR", "MLM", "HES", "K", "EXR", "CFG", "IP", "CPRT", "FANG", "BR", "NUE", "DRI", "FRC", "MKTX", "BBY", "LEN", "WAT", "RF", "AKAM", "CXO", "MAA", "MGM", "CE", "HBAN", "CAG", "CNP", "KMX", "PFG", "XYL", "DGX", "WCG", "UDR", "DOV", "CBOE", "FCX", "HOLX", "GPC", "L"]
-    #SP100 (100)
-    #myTickers = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DD", "DHR", "DIS", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP", "UPS", "USB", "UTX", "V", "VZ", "WBA", "WFC", "WMT", "XOM"]
-    #SP100 1/2_a
-    #mySymbols = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DD", "DHR"]
-    #SP&NQ 1/2_a
-    #mySymbols = ["AAPL", "ABBV", "ABT", "ACN", "ADBE", "AGN", "AIG", "ALL", "AMGN", "AMZN", "AXP", "BA", "BAC", "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CELG", "CHTR", "CL", "CMCSA", "COF", "COP", "COST", "CSCO", "CVS", "CVX", "DD", "DHR", "DIS", "DOW", "DUK", "EMR", "EXC", "F", "FB", "FDX", "GD", "GE", "GILD", "GM", "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "JNJ", "JPM", "KHC", "KMI", "KO", "LLY", "LMT", "LOW", "MA", "MCD", "MDLZ", "MDT", "MET", "MMM", "MO", "MRK", "MS", "MSFT", "NEE", "NFLX", "NKE", "NVDA", "ORCL", "OXY", "PEP", "PFE", "PG", "PM", "PYPL", "QCOM", "RTN", "SBUX", "SLB", "SO", "SPG", "T", "TGT", "TXN", "UNH", "UNP"]
-    #DOW30 1/2_a
-    #mySymbols = ["IBM", "MSFT", "XOM", "MMM", "CVX", "PG", "GS", "HD", "CSCO", "INTC", "PFE", "WBA", "V", "WMT", "UTX", "MCD", "JPM", "NKE", "VZ", "KO", "DIS", "JNJ", "AAPL", "UNH", "MRK", "TRV", "CAT", "AXP", "BA"]
-    #mySymbols = ["IBM", "MSFT", "XOM", "MMM"] #, "CVX", "PG", "GS", "HD", "CSCO", "INTC", "PFE", "WBA", "V", "WMT", "UTX"]
-  
-    
+
  #Simulation Signals [direction, disableBars, Enabled, signalDisabledBars]
     simALL=False
     simDict = {
@@ -171,69 +156,143 @@ class Eq2_ai_4():
     loadAI = True
     preprocDict = {}
     aiDict = {}
-    
-    preprocDict ["CAE_1D_100-16_sm"] = {
-        "enabled": True,
-        "Type": ["PT"][0],
-        "modelClass": "CNN_AE_1",
-        "modelParams" : {"cnn_Dim": [1,2][0],
-                       "inH": 1,
-                       "inW": 100,
-                       "inChannels": 1,
-                       "cnnChannels1": 64,
-                       "cnnChannels2": 128,
-                       "outputs": 16,
-                       "useConvTranspose": False,
-                       "hiddenSize": [None, 64][0],
-                       "hiddenSizeDecode": [None, 64][0],
-                       "dropoutRate": 0.10},
-        "modelURL": "https://www.dropbox.com/s/ram9c51d5m1cvqn/CAE_1D_100-16_sm_Model_20200711-16_41_c.txt?dl=1",
-        "model": None}
-    preprocDict ["CAE_1D_50-8_sm"] = {
-        "enabled": True,
-        "Type": ["PT"][0],
-        "modelClass": "CNN_AE_1",
-        "modelParams" : {"cnn_Dim": [1,2][0],
-                       "inH": 1,
-                       "inW": 50,
-                       "inChannels": 1,
-                       "cnnChannels1": 64,
-                       "cnnChannels2": 128,
-                       "outputs": 8,
-                       "useConvTranspose": False,
-                       "hiddenSize": [None, 64][0],
-                       "hiddenSizeDecode": [None, 64][0],
-                       "dropoutRate": 0.10},
-        "modelURL": "https://www.dropbox.com/s/u80fqif5h3zfpyk/CAE_1D_50-8_sm_Model_20200711-18_14_c.txt?dl=1",
-        "model": None}
 
-    aiDict["L_CNN1"] = {
+#PREPROCESSORS   -------------------------------------------
+
+#MODELS   -------------------------------------------   
+    #RBPA: Trained with Rejection and run with BPA Signals
+    aiDict["L_RBPA-A"] = {
         "enabled": False,
-        "signalRegex": "ALL",
+        "signalRegex": "L_BPA",
         "direction": 1,
-        "Type" : ["SK", "LGB", "PT", "PT_CNN"][2],
+        "Type" : ["SK", "LGB", "PT", "PT_CNN"][1],
         "firstTradeHour": 0,
-        "lastTradeHour": 24,
-        "riskMultiple": 1.00,
-        "modelClass": "NN_1",
-        "modelParams" : {"featureCount": 0, 
-                        "hiddenCount": 0, 
-                        "outFeed": "",
-                        "softmaxout": False,
-                        "outputs": 2},       
-        "modelURL": "https://www.dropbox.com/s/mw9pg986o59e2c8/LGB_FX15m_L_Str%26DCH_s_3MM_3MM_FeatSel_2003_Model_20200307-18_14_booster.txt?dl=1",
+        "lastTradeHour": lastTradeHour,
+        "riskMultiple": 0.50,
+        'customPositionSettings': {},
+        "modelURL": "https://www.dropbox.com/s/sds0bhmrt0c47vb/LGB_L_2007_FeatAll_PCA_Rej_2MM_Model_20200720-19_3711_c_booster.txt?dl=1",
         "model": None,
-        "usePCA": False,
-        "pcaURL": None,
+        "usePCA": True,
+        "pcaURL": "https://www.dropbox.com/s/6x46abage7djkqf/PCA_PCA20_20200724-04_5702.txt?dl=1",
         "pca": None,
-        "rawFeatures": "rawFeatures2",
-        "threshold": 0.0,
+        "rawFeatures": "rawFeatures1",
+        "threshold": 0.50,
         "features": None,
-        "featureFilter": "Feat5_4$|Feat13_2$|Feat13_1$|Feat11_1$|Feat13_0$|Feat11_2$|Feat5_0$|Feat13_3$|Feat17_0$|Feat15_0$|Feat14_0$|Feat15_11$|Feat8_0$|Feat6_4$|Feat6_3$|Feat18_11$|Feat7_0$|Feat11_0$|Feat18_1$|Feat5_2$|Feat8_4$|Feat0_0$|Feat9_0$|Feat11_3$|Feat9_4$|Feat14_1$|Feat15_10$|Feat10_4$|Feat14_2$|Feat13_4$|Feat16_18$|Feat10_0$|Feat6_1$|Feat15_4$|Feat7_3$|Feat15_12$|Feat16_21$|Feat16_1$|Feat16_15$|Feat18_3$|Feat16_17$|Feat16_0$|Feat18_9$|Feat15_5$|Feat0_1$|Feat14_3$|Feat7_1$|Feat10_1$|Feat1_2$|Feat10_2$",
+        "featureFilter": "Feat",
+        "customColumnFilter": [],
+        "dfFilterPassed": True,
+        "signal": False}
+
+    aiDict["L_RBPA-B"] = {
+        "enabled": True,
+        "signalRegex": "L_BPA",
+        "direction": 1,
+        "Type" : ["SK", "LGB", "PT", "PT_CNN"][1],
+        "firstTradeHour": 0,
+        "lastTradeHour": lastTradeHour,
+        "riskMultiple": 0.50,
+        'customPositionSettings': {},
+        "modelURL": "https://www.dropbox.com/s/ihbl7nsn6w7mq1k/LGB_L_2007_FeatAll_PCA_Rej_2MM_Model_20200721-13_5957_c_booster.txt?dl=1",
+        "model": None,
+        "usePCA": True,
+        "pcaURL": "https://www.dropbox.com/s/6x46abage7djkqf/PCA_PCA20_20200724-04_5702.txt?dl=1",
+        "pca": None,
+        "rawFeatures": "rawFeatures1",
+        "threshold": 0.50,
+        "features": None,
+        "featureFilter": "Feat",
         "customColumnFilter": [],
         "dfFilterPassed": True,
         "signal": False}
     
+    aiDict["L_RBPA-C"] = {
+        "enabled": True,
+        "signalRegex": "L_BPA",
+        "direction": 1,
+        "Type" : ["SK", "LGB", "PT", "PT_CNN"][1],
+        "firstTradeHour": 0,
+        "lastTradeHour": lastTradeHour,
+        "riskMultiple": 0.50,
+        'customPositionSettings': {},
+        "modelURL": "https://www.dropbox.com/s/rc9edlbwkmk9gu5/LGB_L_2007_FeatAll_PCA_Rej_2MM_Model_20200721-14_2508_c_booster.txt?dl=1",
+        "model": None,
+        "usePCA": True,
+        "pcaURL": "https://www.dropbox.com/s/6x46abage7djkqf/PCA_PCA20_20200724-04_5702.txt?dl=1",
+        "pca": None,
+        "rawFeatures": "rawFeatures1",
+        "threshold": 0.50,
+        "features": None,
+        "featureFilter": "Feat",
+        "customColumnFilter": [],
+        "dfFilterPassed": True,
+        "signal": False}
+ 
+    aiDict["S_Rej-A"] = {
+        "enabled": False,
+        "signalRegex": "S_BPA",
+        "direction": -1,
+        "Type" : ["SK", "LGB", "PT", "PT_CNN"][1],
+        "firstTradeHour": 0,
+        "lastTradeHour": lastTradeHour,
+        "riskMultiple": 0.50,
+        'customPositionSettings': {},
+        "modelURL": "https://www.dropbox.com/s/0xuxujtnrkf83rw/LGB_S_2007_FeatAll_PCA_Rej_2MM_Model_20200721-13_4807_c_booster.txt?dl=1",
+        "model": None,
+        "usePCA": True,
+        "pcaURL": "https://www.dropbox.com/s/6x46abage7djkqf/PCA_PCA20_20200724-04_5702.txt?dl=1",
+        "pca": None,
+        "rawFeatures": "rawFeatures1",
+        "threshold": 0.50,
+        "features": None,
+        "featureFilter": "Feat",
+        "customColumnFilter": [],
+        "dfFilterPassed": True,
+        "signal": False}
+
+    aiDict["S_Rej-B"] = {
+        "enabled": False,
+        "signalRegex": "S_BPA",
+        "direction": -1,
+        "Type" : ["SK", "LGB", "PT", "PT_CNN"][1],
+        "firstTradeHour": 0,
+        "lastTradeHour": lastTradeHour,
+        "riskMultiple": 0.50,
+        'customPositionSettings': {},
+        "modelURL": "https://www.dropbox.com/s/jitvqwff2be2ur3/LGB_S_2007_FeatAll_PCA_Rej_2MM_Model_20200721-13_5045_c_booster.txt?dl=1",
+        "model": None,
+        "usePCA": True,
+        "pcaURL": "https://www.dropbox.com/s/6x46abage7djkqf/PCA_PCA20_20200724-04_5702.txt?dl=1",
+        "pca": None,
+        "rawFeatures": "rawFeatures1",
+        "threshold": 0.50,
+        "features": None,
+        "featureFilter": "Feat",
+        "customColumnFilter": [],
+        "dfFilterPassed": True,
+        "signal": False}
+
+    aiDict["S_Rej-C"] = {
+        "enabled": False,
+        "signalRegex": "S_BPA",
+        "direction": -1,
+        "Type" : ["SK", "LGB", "PT", "PT_CNN"][1],
+        "firstTradeHour": 0,
+        "lastTradeHour": lastTradeHour,
+        "riskMultiple": 0.50,
+        'customPositionSettings': {},
+        "modelURL": "https://www.dropbox.com/s/0xuxujtnrkf83rw/LGB_S_2007_FeatAll_PCA_Rej_2MM_Model_20200721-13_4807_c_booster.txt?dl=1",
+        "model": None,
+        "usePCA": True,
+        "pcaURL": "https://www.dropbox.com/s/6x46abage7djkqf/PCA_PCA20_20200724-04_5702.txt?dl=1",
+        "pca": None,
+        "rawFeatures": "rawFeatures1",
+        "threshold": 0.50,
+        "features": None,
+        "featureFilter": "Feat",
+        "customColumnFilter": [],
+        "dfFilterPassed": True,
+        "signal": False}
+
     def __init__(self, caller, symbol, var):
         self.CL = self.__class__
         self.algo = caller
@@ -261,55 +320,100 @@ class Eq2_ai_4():
         '''Indicators'''
         self.atr1 = AverageTrueRange(15)
         self.algo.RegisterIndicator(self.symbol, self.atr1, self.consolidator)
-        self.atr2 = AverageTrueRange(50)
+        self.atr2 = AverageTrueRange(70)
         self.algo.RegisterIndicator(self.symbol, self.atr2, self.consolidator)
         
+        self.sma1 = SimpleMovingAverage (70)
+        self.algo.RegisterIndicator(self.symbol, self.sma1, self.consolidator)
+        self.sma2 = SimpleMovingAverage (140)
+        self.algo.RegisterIndicator(self.symbol, self.sma2, self.consolidator)
+        self.sma3 = SimpleMovingAverage (280)
+        self.algo.RegisterIndicator(self.symbol, self.sma3, self.consolidator)
+
         self.dch_s = DonchianChannel(3)
         self.algo.RegisterIndicator(self.symbol, self.dch_s, self.consolidator)
-        self.dch0 = DonchianChannel(1)
+        self.dch0 = DonchianChannel(4)
         self.algo.RegisterIndicator(self.symbol, self.dch0, self.consolidator)
-        self.dch01 = DonchianChannel(4)
+        self.dch01 = DonchianChannel(7)
         self.algo.RegisterIndicator(self.symbol, self.dch01, self.consolidator)
-        self.dch02 = DonchianChannel(8)
+        self.dch02 = DonchianChannel(20)
         self.algo.RegisterIndicator(self.symbol, self.dch02, self.consolidator)
-        self.dch1 = DonchianChannel(16)
+        self.dch1 = DonchianChannel(35)
         self.algo.RegisterIndicator(self.symbol, self.dch1, self.consolidator)
-        self.dch2 = DonchianChannel(35)
+        self.dch2 = DonchianChannel(70)
         self.algo.RegisterIndicator(self.symbol, self.dch2, self.consolidator)
-        self.dch3 = DonchianChannel(70)
+        self.dch3 = DonchianChannel(280)
         self.algo.RegisterIndicator(self.symbol, self.dch3, self.consolidator)
-        self.dch4 = DonchianChannel(140)
+        self.dch4 = DonchianChannel(420)
         self.algo.RegisterIndicator(self.symbol, self.dch4, self.consolidator)
-
+        
+        self.rsi1 = RelativeStrengthIndex(15)
+        self.algo.RegisterIndicator(self.symbol, self.rsi1, self.consolidator)
+        self.rsi2 = RelativeStrengthIndex(40)
+        self.algo.RegisterIndicator(self.symbol, self.rsi2, self.consolidator)
+        
+        self.myRelativePrice = MyRelativePrice(self, self.algo, self.symbol, "RelPrice", 200, self.atr1)
+        self.algo.RegisterIndicator(self.symbol, self.myRelativePrice, self.consolidator)
+        
+        self.zz = MyZigZag(self, self.algo, self.symbol, name='zz', period=200, atr=self.atr1, lookback=10, thresholdType=2, threshold=10)
+        self.algo.RegisterIndicator(self.symbol, self.zz, self.consolidator)
+        
         self.vol = MyVolatility(self, self.algo, self.symbol, name='vol', period=200, atr=self.atr1)
         self.algo.RegisterIndicator(self.symbol, self.vol, self.consolidator)
-        
-        self.gasf1 = MyGASF(self, self.algo, self.symbol, name='gasf1', period=100, atr=self.atr1, benchmarkTicker=None)
-        self.algo.RegisterIndicator(self.symbol, self.gasf1, self.consolidator)
 
         '''Indicators Higher Timeframe'''
         self.atr1_2 = AverageTrueRange(5)
         self.algo.RegisterIndicator(self.symbol, self.atr1_2, self.consolidator_2)
+        self.sma1_2 = SimpleMovingAverage (50)
+        self.algo.RegisterIndicator(self.symbol, self.sma1_2, self.consolidator_2)
+        self.sma2_2 = SimpleMovingAverage (100)
+        self.algo.RegisterIndicator(self.symbol, self.sma2_2, self.consolidator_2)
+        self.dch1_2 = DonchianChannel(80)
+        self.algo.RegisterIndicator(self.symbol, self.dch1_2, self.consolidator_2)
         self.dch2_2 = DonchianChannel(100)
         self.algo.RegisterIndicator(self.symbol, self.dch2_2, self.consolidator_2)
-
-        self.gasf1_2 = MyGASF(self, self.algo, self.symbol, name='gasf1_2', period=100, atr=self.atr1_2, benchmarkTicker=None)
-        self.algo.RegisterIndicator(self.symbol, self.gasf1_2, self.consolidator)
-
+        
+        self.rsi1_2 = RelativeStrengthIndex(10)
+        self.algo.RegisterIndicator(self.symbol, self.rsi1_2, self.consolidator_2)
+        self.rsi2_2 = RelativeStrengthIndex(20)
+        self.algo.RegisterIndicator(self.symbol, self.rsi2_2, self.consolidator_2)
+        
+        self.myRelativePrice_2 = MyRelativePrice(self, self.algo, self.symbol, "RelPrice_2", 100, self.atr1_2)
+        self.algo.RegisterIndicator(self.symbol, self.myRelativePrice_2, self.consolidator_2)
+        
+        self.zz_2 = MyZigZag(self, self.algo, self.symbol, name='zz_2', period=100, atr=self.atr1_2, lookback=6, thresholdType=2, threshold=10)
+        self.algo.RegisterIndicator(self.symbol, self.zz_2, self.consolidator_2)
+        
+        self.vol_2 = MyVolatility(self, self.algo, self.symbol, name='vol_2', period=101, atr=self.atr1_2, benchmarkVolAttr='vol_2')
+        self.algo.RegisterIndicator(self.symbol, self.vol_2, self.consolidator_2)
+        
         '''Symbol State and Features'''
-        #GASF indicator implements FeatureExtraction method
+        self.state_sma1 = MyMAState (self, self.sma1, self.sma2)
+        self.state_sma2 = MyMAState (self, self.sma2, self.sma3)
+        self.state_sma3 = MyMAState (self, self.sma3, self.sma1_2)
+        self.state_sma1_2 = MyMAState (self, self.sma1_2, self.sma2_2)
+        self.state_sma2_2 = MyMAState (self, self.sma2_2)
+
+        self.state_dch_s = MyDCHState (self, self.dch_s, self.dch2, name='s')
+        self.state_dch0 = MyDCHState (self, self.dch0, self.dch1, name='0')
+        self.state_dch1 = MyDCHState (self, self.dch1, self.dch2, name='1')
+        self.state_dch2 = MyDCHState (self, self.dch2, self.dch3, name='2')
+        self.state_dch3 = MyDCHState (self, self.dch3, self.dch4, name='3')
+        self.state_dch4 = MyDCHState (self, self.dch4, self.dch1_2, name='4')
+        self.state_dch1_2 = MyDCHState (self, self.dch1_2, self.dch2_2, name='1_2')
+        self.state_dch2_2 = MyDCHState (self, self.dch2_2, name='2_2')
 
         '''Signals'''
-        self.barStrength1 = MyBarStrength(self, self.algo, self.symbol, name='barStrength1', period=10, atr=self.atr1, lookbackLong=2, lookbackShort=2, \
+        self.barStrength1 = MyBarStrength(self, self.algo, self.symbol, name='str1', period=10, atr=self.atr1, lookbackLong=2, lookbackShort=2, \
                 priceActionMinATRLong=1.5, priceActionMaxATRLong=2.5, priceActionMinATRShort=1.5, priceActionMaxATRShort=2.5, referenceTypeLong='Close', referenceTypeShort='Close')
         self.algo.RegisterIndicator(self.symbol, self.barStrength1, self.consolidator)
         
-        self.barRejection1 = MyBarRejection(self, self.algo, self.symbol, name='barRejection1', period=10, atr=self.atr1, lookbackLong=3, lookbackShort=3, \
+        self.barRejection1 = MyBarRejection(self, self.algo, self.symbol, name='rej1', period=10, atr=self.atr1, lookbackLong=3, lookbackShort=3, \
                rejectionPriceTravelLong=1.75, rejectionPriceTravelShort=1.75, rejectionPriceRangeLong=0.40, rejectionPriceRangeShort=0.40, referenceTypeLong='Close', referenceTypeShort='Close')
         self.algo.RegisterIndicator(self.symbol, self.barRejection1, self.consolidator)
-
+        
         self.bpa1 = MyBPA(self, self.algo, self.symbol, name='bpa1', period=10, atr=self.atr1, lookbackLong=1, lookbackShort=1, \
-                    minBarAtrLong=1.0, minBarAtrShort=1.0, referenceTypeLong='Close', referenceTypeShort='Close', gapATRLimitLong=1.0, gapATRLimitShort=1.0)
+                    minBarAtrLong=1.50, minBarAtrShort=1.50, referenceTypeLong='Close', referenceTypeShort='Close', gapATRLimitLong=1.0, gapATRLimitShort=1.0, needBPAinTrend=True, atrTrendChange=10.0)
         self.algo.RegisterIndicator(self.symbol, self.bpa1, self.consolidator)
         
         '''Signals and Events string Container'''
@@ -328,28 +432,33 @@ class Eq2_ai_4():
                 #Loading MODEL
                 if preprObj["Type"] == "PT":
                     preprObj["model"] = globals()[preprObj["modelClass"]](**preprObj["modelParams"]).to('cpu')
-                    preprObj["model"] = hp3.MyModelLoader.LoadModelTorch(self, preprObj["modelURL"], existingmodel=preprObj["model"])
+                    preprObj["model"] = hp.MyModelLoader.LoadModelTorch(self, preprObj["modelURL"], existingmodel=preprObj["model"])
                     self.algo.Debug(f' Torch MODEL ({preprKey}/{self.CL.strategyCode}) LOADED from url: {preprObj["modelURL"]}')
 
         '''Set up AI models'''
         self.signalDisabledBars = {}
         for aiKey, aiObj in self.CL.aiDict.items():
             if self.CL.loadAI and aiObj["enabled"] and aiObj["model"]==None:
+                #Checking customPositionSettings['targetPlacer'] Consistency
+                defaultTargetPlecer = self.CL.targetPlacerLong if aiObj["direction"]==1 else self.CL.targetPlacerShort
+                if (defaultTargetPlecer[0]==None and ('customPositionSettings' in aiObj and 'targetPlacer' in aiObj['customPositionSettings'] and aiObj['customPositionSettings']['targetPlacer'][0]!=None)) or \
+                        (defaultTargetPlecer[0]!=None and ('customPositionSettings' in aiObj and 'targetPlacer' in aiObj['customPositionSettings'] and aiObj['customPositionSettings']['targetPlacer'][0]==None)):
+                    raise Exception(f"AI customPositionSettings _UL Mismatch! defaultTargetPlecer: {defaultTargetPlecer[0]} and customPositionSettings['targetPlacer']: {aiObj['customPositionSettings']['targetPlacer'][0]}")    
                 #Loading PCA Preprocessor if set
                 if aiObj["usePCA"]: 
-                    aiObj["pca"] = hp3.MyModelLoader.LoadModelPickled(self, aiObj["pcaURL"])
+                    aiObj["pca"] = hp.MyModelLoader.LoadModelPickled(self, aiObj["pcaURL"])
                     self.algo.Debug(f' PCA ({aiKey}) LOADED from url: {aiObj["pcaURL"]}')
                 #Loading MODEL
                 if aiObj["Type"] == "PT" or aiObj["Type"] == "PT_CNN":
                     aiObj["model"] = globals()[aiObj["modelClass"]](**aiObj["modelParams"]).to('cpu')
-                    aiObj["model"] = hp3.MyModelLoader.LoadModelTorch(self, aiObj["modelURL"], existingmodel=aiObj["model"])
+                    aiObj["model"] = hp.MyModelLoader.LoadModelTorch(self, aiObj["modelURL"], existingmodel=aiObj["model"])
                     self.algo.Debug(f' Torch MODEL ({aiKey}/{self.CL.strategyCode}) LOADED from url: {aiObj["modelURL"]}')
                 elif aiObj["Type"] == "SK":
-                    aiObj["model"] = hp3.MyModelLoader.LoadModelPickled(self, aiObj["modelURL"])
+                    aiObj["model"] = hp.MyModelLoader.LoadModelPickled(self, aiObj["modelURL"])
                     self.algo.Debug(f' SKLearn MODEL ({aiKey}/{self.CL.strategyCode}) LOADED from url: {aiObj["modelURL"]}')
                 elif aiObj["Type"] == "LGB":
-                    #aiObj["model"] = hp3.MyModelLoader.LoadModelLGBtxt(self, aiObj["modelURL"])
-                    aiObj["model"] = hp3.MyModelLoader.LoadModelLGB(self, aiObj["modelURL"])
+                    #aiObj["model"] = hp.MyModelLoader.LoadModelLGBtxt(self, aiObj["modelURL"])
+                    aiObj["model"] = hp.MyModelLoader.LoadModelLGB(self, aiObj["modelURL"])
                     self.algo.Debug(f' LGB MODEL ({aiKey}/{self.CL.strategyCode}) LOADED from url: {aiObj["modelURL"]}')
             self.signalDisabledBars[aiKey] = 0
         
@@ -419,7 +528,7 @@ class Eq2_ai_4():
         loadFeatures1, loadFeatures2 = False, False
         for aiKey, aiObj in self.CL.aiDict.items():
             signalRegex = aiObj["signalRegex"] if "signalRegex" in aiObj.keys() else aiKey
-            aiObj["signal"] = aiObj["enabled"] and (signalRegex=="ALL" or re.search(signalRegex, self.signals)) and aiObj["firstTradeHour"] <= self.algo.Time.hour and self.algo.Time.hour <= aiObj["lastTradeHour"]
+            aiObj["signal"] = aiObj["enabled"] and (signalRegex=="ALL" or re.search(signalRegex, self.signals)) and aiObj["firstTradeHour"] <= bar.EndTime.hour and bar.EndTime.hour <= aiObj["lastTradeHour"]
             if aiObj["signal"]:
                 #self.algo.MyDebug(f' Signal:{aiKey} {self.symbol}')
                 #self.algo.signalsTotal+=1
@@ -446,23 +555,21 @@ class Eq2_ai_4():
             preProcessedFeature1 = self.gasf1.FeatureExtractor(featureType="Close", useGASF=True, picleFeatures=False, preProcessor=self.CL.preprocDict["CNNAE_1"]["model"])
             self.algo.MyDebug(f'preProcessedFeature1: {preProcessedFeature1.shape}')
         if loadFeatures1 or (longTriggerSim or shortTriggerSim):
-            self.rawFeatures1 = [self.gasf1.FeatureExtractor(featureType="Close", preProcessor=self.CL.preprocDict ["CAE_1D_100-16_sm"]["model"], returnList=True), \
-                                 self.gasf1.FeatureExtractor(n=8, featureType="ULBG", returnList=True), \
-                                 self.gasf1.FeatureExtractor(n=50, featureType="RelativePrice", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
-                                 self.gasf1.FeatureExtractor(n=50, featureType="Volatility", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
-                                 self.gasf1_2.FeatureExtractor(featureType="Close", preProcessor=self.CL.preprocDict ["CAE_1D_100-16_sm"]["model"], returnList=True), \
-                                 self.gasf1_2.FeatureExtractor(n=8, featureType="ULBG", returnList=True), \
-                                 self.gasf1_2.FeatureExtractor(n=50, featureType="RelativePrice", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
-                                 self.gasf1_2.FeatureExtractor(n=50, featureType="Volatility", preProcessor=self.CL.preprocDict ["CAE_1D_50-8_sm"]["model"], returnList=True), \
-                                 self.gasf1_2.FeatureExtractor(n=8, featureType="Volume", returnList=True)]
+            self.rawFeatures1 = [ self.state_sma1.FeatureExtractor(Type=11), self.state_sma2.FeatureExtractor(Type=11), self.state_sma3.FeatureExtractor(Type=11), self.state_sma1_2.FeatureExtractor(Type=11), self.state_sma2_2.FeatureExtractor(Type=11), \
+                                self.state_dch0.FeatureExtractor(Type=6), self.state_dch1.FeatureExtractor(Type=6), self.state_dch2.FeatureExtractor(Type=6), self.state_dch3.FeatureExtractor(Type=6), self.state_dch4.FeatureExtractor(Type=6), self.state_dch1_2.FeatureExtractor(Type=6), \
+                                self.myRelativePrice.FeatureExtractor(Type=1, normalizationType=1, lookbacklist=[8,28,42], featureMask=[0,0,1,1]), self.myRelativePrice_2.FeatureExtractor(Type=1, normalizationType=1, lookbacklist=[10,20,50], featureMask=[0,0,1,1]), \
+                                self.vol.FeatureExtractor(Type=5, lookbacklist=[28,28,42]), \
+                                self.vol_2.FeatureExtractor(Type=5, lookbacklist=[10,20,50], avgPeriod=70), \
+                                self.zz.FeatureExtractor(listLen=20, Type=11), self.zz.FeatureExtractor(listLen=20, Type=21), self.zz_2.FeatureExtractor(listLen=6, Type=11), self.zz_2.FeatureExtractor(listLen=6, Type=21), \
+                                [self.rsi1.Current.Value, self.rsi2.Current.Value, self.rsi1_2.Current.Value, self.rsi2_2.Current.Value] ]
         
         if loadFeatures2:
             self.rawFeatures2 = []
  
         for aiObj in self.CL.aiDict.values():
             if aiObj["enabled"] and aiObj["signal"]: 
-                featureFilter = aiObj["featureFilter"]
-                myFeatures = self.algo.myHelpers.UnpackFeatures(getattr(self, aiObj["rawFeatures"]),  featureType=6, featureRegex=featureFilter, reshapeTuple=None)
+                myFeatures = self.algo.myHelpers.UnpackFeatures(getattr(self, aiObj["rawFeatures"], self.rawFeatures1),  featureType=aiObj["featureType"] if "featureType" in aiObj else 1, \
+                                featureRegex=aiObj["featureFilter"] if "featureFilter" in aiObj else 'Feat', reshapeTuple=None)
                 customColumnFilters = aiObj["customColumnFilter"]
                 aiObj["dfFilterPassed"] = self.algo.myHelpers.FeatureCustomColumnFilter(myFeatures, customColumnFilters=customColumnFilters) if len(customColumnFilters)!=0 else True
                 if aiObj["Type"] != "PT_CNN": myFeatures = myFeatures.values
@@ -472,10 +579,9 @@ class Eq2_ai_4():
                     myFeatures = torch.from_numpy(myFeatures.reshape(-1, aiObj["featureCount"])).float().to('cpu')
                 aiObj["features"] = myFeatures
 
-        '''SIGNAL FILTERING
+        '''SIGNAL FILTERING AND TRADE TRIGGERS
         '''
         longTrigger, shortTrigger = False, False
-        longRiskMultiple, shortRiskMultiple = 1.00, 1.00
         for aiKey, aiObj in self.CL.aiDict.items():
             #This is for Stat5 signal compatibility
             self.signalDisabledBars[aiKey] = max(self.signalDisabledBars[aiKey]-1,0)
@@ -492,13 +598,23 @@ class Eq2_ai_4():
                         trigger = aiObj["model"].predict(aiObj["features"])
                 #Setting Trade Trigger Flags
                 if trigger and aiObj["direction"]==1:
-                    longTrigger = True
-                    longRiskMultiple = min(1.00,max(aiObj["riskMultiple"],0.00))
-                    self.CL.strategyCode = self.CL.strategyCode + "|" + aiKey
+                    if shortTrigger:
+                        #Both Direction -> Undecided
+                        longTrigger, shortTrigger = False, False
+                    else:
+                        longTrigger = True
+                        riskMultiple = min(1.00, max(aiObj["riskMultiple"], 0.00)) if "riskMultiple" in aiObj else 1.00
+                        customPositionSettings = aiObj["customPositionSettings"] if "customPositionSettings" in aiObj else {}
+                        self.CL.strategyCode = self.CL.strategyCode + "|" + aiKey
                 elif trigger and aiObj["direction"]==-1:
-                    shortTrigger = True
-                    shortRiskMultiple = min(1.00,max(aiObj["riskMultiple"],0.00))
-                    self.CL.strategyCode = self.CL.strategyCode + "|" + aiKey
+                    if longTrigger:
+                        #Both Direction -> Undecided
+                        longTrigger, shortTrigger = False, False
+                    else:
+                        shortTrigger = True
+                        riskMultiple = min(1.00, max(aiObj["riskMultiple"], 0.00)) if "riskMultiple" in aiObj else 1.00
+                        customPositionSettings = aiObj["customPositionSettings"] if "customPositionSettings" in aiObj else {}
+                        self.CL.strategyCode = self.CL.strategyCode + "|" + aiKey
             if aiObj["signal"] and self.signalDisabledBars[aiKey]==0: self.signalDisabledBars[aiKey] = 8
 
         '''POSITION ENTRY/FLIP (Flip Enabled is checked in EnterPosition_2)
@@ -507,12 +623,12 @@ class Eq2_ai_4():
         self.shortDisabledBars = max(self.shortDisabledBars-1,0)
         #---LONG POSITION
         if self.posEnabled and self.CL.enableLong and self.longDisabledBars==0 and longTrigger:
-            self.algo.myPositionManager.EnterPosition_2(self.symbol, 1, myRiskMultiple=longRiskMultiple)
+            self.algo.myPositionManager.EnterPosition_2(self.symbol, 1, myRiskMultiple=riskMultiple, customPositionSettings=customPositionSettings)
             if False: self.algo.MyDebug(f' Long Trade: {self.symbol}')
             self.longDisabledBars=3
         #---SHORT POSITION
         elif self.posEnabled and self.CL.enableShort and self.shortDisabledBars==0 and shortTrigger:
-            self.algo.myPositionManager.EnterPosition_2(self.symbol, -1, myRiskMultiple=shortRiskMultiple)
+            self.algo.myPositionManager.EnterPosition_2(self.symbol, -1, myRiskMultiple=riskMultiple, customPositionSettings=customPositionSettings)
             if False: self.algo.MyDebug(f' Short Trade: {self.symbol}')
             self.shortDisabledBars=3
 
@@ -537,8 +653,10 @@ class Eq2_ai_4():
             myFeatures = self.rawFeatures1
         self.longSimDisabledBars=max(self.longSimDisabledBars-1,0)
         self.shortSimDisabledBars=max(self.shortSimDisabledBars-1,0)
-        simTradeTypes = [[0,2], [0,2,3,4,7,8,10,14], [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]][1]
-        simMinMaxTypes = [[0,1], [0,1,2,3]][1]
+        #simTradeTypes = [[0,2], [0,2,3,4,7,8,10,14], [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]][1]
+        simTradeTypes = ({'s':5, 't':35, 'mpo':1.5, 'sc':True, 's_t':None}, {'s':7, 't':70, 'mpo':1.5, 'sc':True, 's_t':None})
+        #simMinMaxTypes = [[0,1], [0,1,2,3]][1]
+        simMinMaxTypes = ({'n':5}, {'n':10})
         lastEntryDate = datetime(year = 3019, month = 10, day = 7)
         if self.CL.simulate and self.posEnabled and longTriggerSim and (self.algo.Time<self.algo.simEndDate or self.algo.simEndDate==None):
             if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Long: {self.signals}')
@@ -611,67 +729,50 @@ class Eq2_ai_4():
 '''
 TORCH MODEL(S)
 '''
-class NN_1(nn.Module):
-   def __init__(self, features, hiddenSize=None, outFeed='_h3', outputs=2, dropoutRateIn=0.0, dropoutRate=0.0, dropoutRate2=None, softmaxout=False, bn_momentum=0.1):
-       super(NN_1, self).__init__()
+class NN_2(nn.Module):
+   def __init__(self, features, inputSize=None, hiddenSize1=None, hiddenSize2=None, hiddenSize3=None, outFeed='_h3', outputs=2, softmaxout=False, dropoutRate_in=0.0, dropoutRate_h=0.0, bn_momentum=0.1):
+       super(NN_2, self).__init__()
        self.outputs = outputs
        self.features = features
        self.softmaxout = softmaxout
-       if hiddenSize!=None:
-           self.hiddenSize = hiddenSize
-       else:
-           self.hiddenSize = round(1.0*features)
+       self.inputSize=inputSize if inputSize!=None else features
+       self.hiddenSize1 = hiddenSize1 if hiddenSize1!=None else features
+       self.hiddenSize2 = hiddenSize2 if hiddenSize2!=None else features
+       self.hiddenSize3 = hiddenSize3 if hiddenSize3!=None else features
+       self.out_inFeatures = {
+           '_in': self.inputSize,
+           '_h1': self.hiddenSize1,
+           '_h2': self.hiddenSize2,
+           '_h3': self.hiddenSize3,}[outFeed]
+
        #https://machinelearningmastery.com/batch-normalization-for-training-of-deep-neural-networks/ , https://blog.paperspace.com/busting-the-myths-about-batch-normalization/
        #https://pytorch.org/docs/stable/nn.html?highlight=nn%20batchnorm1d#torch.nn.BatchNorm1d
-       self.bn0 = nn.BatchNorm1d(num_features=features, momentum=bn_momentum)
-       self.layer_In = torch.nn.Linear(features, self.hiddenSize)
-       self.bn01 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_h1 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-       self.bn1 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_h2 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-       self.bn2 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_h3 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-       self.bn3 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_h4 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-       self.bn4 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_h5 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-       self.bn5 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_h6 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-       self.bn6 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_h7 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-       self.bn7 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-      #  self.layer_h8 = torch.nn.Linear(self.hiddenSize, self.hiddenSize)
-      #  self.bn8 = nn.BatchNorm1d(num_features=self.hiddenSize, momentum=bn_momentum)
-       self.layer_Out = torch.nn.Linear(self.hiddenSize, self.outputs)
+       self.bn_in = nn.BatchNorm1d(num_features=features, momentum=bn_momentum)
+       self.layer_In = torch.nn.Linear(features, self.inputSize)
+       self.bn_h1 = nn.BatchNorm1d(num_features=self.inputSize, momentum=bn_momentum)
+       self.layer_h1 = torch.nn.Linear(self.inputSize, self.hiddenSize1)
+       self.bn_h2 = nn.BatchNorm1d(num_features=self.hiddenSize1, momentum=bn_momentum)
+       self.layer_h2 = torch.nn.Linear(self.hiddenSize1, self.hiddenSize2)
+       self.bn_h3 = nn.BatchNorm1d(num_features=self.hiddenSize2, momentum=bn_momentum)
+       self.layer_h3 = torch.nn.Linear(self.hiddenSize2, self.hiddenSize3)
+       self.bn_out = nn.BatchNorm1d(num_features=self.out_inFeatures, momentum=bn_momentum)
+       self.layer_Out = torch.nn.Linear(self.out_inFeatures, self.outputs)
        #https://towardsdatascience.com/simplified-math-behind-dropout-in-deep-learning-6d50f3f47275
        self.L_out = {}
        self.outFeed = outFeed 
        #https://towardsdatascience.com/simplified-math-behind-dropout-in-deep-learning-6d50f3f47275
-       self.dropoutRateIn = dropoutRateIn
-       self.dropoutRate = dropoutRate
-       self.dropoutRate2 = self.dropoutRate if dropoutRate2==None else dropoutRate2
+       self.dropoutRate_in = dropoutRate_in
+       self.dropoutRate_h = dropoutRate_h
        #https://mlfromscratch.com/activation-functions-explained/ 
        self.MyActivation = [F.relu, F.leaky_relu_, F.selu][2]
-       self.useOutBn = True
-       if self.useOutBn: self.bn_out = nn.BatchNorm1d(num_features=self.outputs, momentum=bn_momentum)
-                     
+                        
    def forward(self, x):
-       self.L_out['_x'] =  F.dropout(self.bn0(x), p=self.dropoutRateIn, training=self.training)
        #https://datascience.st  ackexchange.com/questions/5706/what-is-the-dying-relu-problem-in-neural-networks
-
-       self.L_out['_in'] =  F.dropout(self.bn01(self.MyActivation(self.layer_In(self.L_out['_x']))),  p=self.dropoutRate, training=self.training)
-       self.L_out['_h1'] =  F.dropout(self.bn1(self.MyActivation(self.layer_h1(self.L_out['_in']))),  p=self.dropoutRate2, training=self.training)
-       self.L_out['_h2'] =  F.dropout(self.bn2(self.MyActivation(self.layer_h2(self.L_out['_h1']))),  p=self.dropoutRate2, training=self.training)
-       self.L_out['_h3'] =  F.dropout(self.bn3(self.MyActivation(self.layer_h3(self.L_out['_h2']))),  p=self.dropoutRate2, training=self.training)
-       self.L_out['_h4'] =  F.dropout(self.bn4(self.MyActivation(self.layer_h4(self.L_out['_h3']))),  p=self.dropoutRate2, training=self.training)
-       #self.L_out['_h5'] =  F.dropout(self.bn5(self.MyActivation(self.layer_h5(self.L_out['_h4']))),  p=self.dropoutRate2, training=self.training)
-       #self.L_out['_h6'] =  F.dropout(self.bn6(self.MyActivation(self.layer_h6(self.L_out['_h5']))),  p=self.dropoutRate2, training=self.training)
-       #self.L_out['_h7'] =  F.dropout(self.bn7(self.MyActivation(self.layer_h7(self.L_out['_h6']))),  p=self.dropoutRate2, training=self.training)
-       #self.L_out['_h8'] =  F.dropout(self.bn8(self.MyActivation(self.layer_h8(self.L_out['_h7']))),  p=self.dropoutRate2, training=self.training)
-       if self.useOutBn:
-         self.L_out['_out'] = self.bn_out(self.MyActivation(self.layer_Out(self.L_out[self.outFeed])))
-       else:
-         self.L_out['_out'] = self.MyActivation(self.layer_Out(self.L_out[self.outFeed]))
+       self.L_out['_in']  =  self.MyActivation(self.layer_In(self.bn_in(F.dropout(x, p=self.dropoutRate_in , training=self.training))))
+       self.L_out['_h1']  =  self.MyActivation(self.layer_h1(self.bn_h1(F.dropout(self.L_out['_in'], p=self.dropoutRate_h, training=self.training))))
+       self.L_out['_h2']  =  self.MyActivation(self.layer_h2(self.bn_h2(F.dropout(self.L_out['_h1'], p=self.dropoutRate_h, training=self.training))))
+       self.L_out['_h3']  =  self.MyActivation(self.layer_h3(self.bn_h3(F.dropout(self.L_out['_h2'], p=self.dropoutRate_h, training=self.training))))
+       self.L_out['_out'] =  self.MyActivation(self.layer_Out(self.bn_out(self.L_out[self.outFeed])))
        #https://towardsdatascience.com/complete-guide-of-activation-functions-34076e95d044
        #https://medium.com/@himanshuxd/activation-functions-sigmoid-relu-leaky-relu-and-softmax-basics-for-neural-networks-and-deep-8d9c70eed91e
        if self.softmaxout:
@@ -684,11 +785,11 @@ class NN_1(nn.Module):
        self.eval()
        prediction = self.forward(x)
        #prediction = prediction.data.numpy()
-       prediction = np.argmax(prediction.data.numpy(), axis=1) #armax returns a tuple
+       prediction =np.argmax(prediction.data.numpy(), axis=1) #armagx returns a tuple
        if len(prediction)==1:
            return prediction[0]
        return prediction
-   
+ 
    def Predict2(self, x):
        self.eval()
        prediction = self.forward(x).data.numpy()
@@ -825,4 +926,3 @@ class CNN_AE_1(nn.Module):
         x = x.data.numpy()
         x = np.squeeze(x)
         return x
-

@@ -82,6 +82,15 @@
     <Content Include="Benchmarks\SmartInsiderEventBenchmarkAlgorithm.py" />
     <Content Include="CustomDataAddDataOnSecuritiesChangedRegressionAlgorithm.py" />
     <Content Include="CustomDataAddDataCoarseSelectionRegressionAlgorithm.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\eq_st8_b.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\hp.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\main.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\pm.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\pmB.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\sim.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\ta.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\taB.py" />
+    <Content Include="Dev_Stat8_B_fw1_0\var.py" />
     <Content Include="DynamicSecurityDataAlgorithm.py" />
     <Content Include="ConfidenceWeightedFrameworkAlgorithm.py" />
     <Content Include="KerasNeuralNetworkAlgorithm.py" />
