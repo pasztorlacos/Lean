@@ -90,7 +90,7 @@ class MyAlgo(QCAlgorithm):
         '''BACKTEST DATES and SETTINGS'''
         #Start Date
         #self.SetStartDate(datetime.now() - timedelta(days=30))  
-        self.simStartYear=2018
+        self.simStartYear=2005
         self.SetStartDate(self.simStartYear,1,1)
 
         #End Date
@@ -98,7 +98,7 @@ class MyAlgo(QCAlgorithm):
         self.simYears = 20
         self.simEndDate = datetime(self.simStartYear+self.simYears, 1, 1, 0, 0) #Use None if not applicable
         self.SetEndDate(min(self.simEndDate + timedelta(days=30), datetime(2019,10,10)))
-        self.SetEndDate(datetime.now())
+        #self.SetEndDate(datetime.now())
         
         #self.Portfolio.SetAccountCurrency("EUR")
         self.SetCash(100000)

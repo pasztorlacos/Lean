@@ -660,7 +660,8 @@ class Eq_St14():
                             {'s':35, 't':70, 'mpo':1.7, 'sc':True, 'st':None, 'msd':2.0})
         simMinMaxTypes = (  {'n':5},  \
                             {'n':10}, \
-                            {'n':20})
+                            {'n':20}, \
+                            {'n':35})
         lastEntryDate = datetime(year = 3019, month = 10, day = 7)
         if self.CL.simulate and self.posEnabled and longTriggerSim and (self.algo.Time<self.algo.simEndDate or self.algo.simEndDate==None):
             if debugSim: self.algo.MyDebug(f' {self.symbol} Sim call Long: {self.signals}')
