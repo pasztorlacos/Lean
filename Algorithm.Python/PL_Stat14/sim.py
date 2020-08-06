@@ -145,7 +145,8 @@ class MySIMPosition():
             stopTrailer =       simTrade['st']     # None if no trail
             minStopDistance =   simTrade['msd']*self.symbolStrat.atr1.Current.Value if 'msd' in simTrade else  3.0*self.symbolStrat.atr1.Current.Value
             targetPrice = None
-            
+            targetMargin = 0.10*self.symbolStrat.atr1.Current.Value
+
             #If the first sim: Initialize rawDataHeader
             if not self.CL.hasPosition and self.CL.useHeader: self.rawDataHeader.extend((str(tradeNo)+"_PPct", str(tradeNo)+"_PAtr", str(tradeNo)+"_PayOff", str(tradeNo)+"_Bars"))
             
@@ -153,14 +154,14 @@ class MySIMPosition():
                 stopPriceTarget = min([bar.Low for bar in self.symbolStrat.bars_rw][0:stopPlacer])
                 stopPrice = min(stopPriceTarget, self.entryPrice - minStopDistance)
                 mintargetPrice = self.entryPrice + minPayOff * (self.entryPrice - stopPrice) if minPayOff!=None else self.entryPrice
-                targetPriceTarget = max([bar.High for bar in self.symbolStrat.bars_rw][0:targetPlacer]) if targetPlacer!=None else self.entryPrice
+                targetPriceTarget = max([bar.High for bar in self.symbolStrat.bars_rw][0:targetPlacer])-targetMargin if targetPlacer!=None else self.entryPrice
                 targetPrice = max(mintargetPrice, targetPriceTarget) if minPayOff!=None or targetPlacer!=None else None
                 newTrade = MySIMTrade(self, len(self.positionData), self.entryPrice, stopPrice, targetPrice, scratchTrade, stopTrailer)
             if self.direction==-1:
                 stopPriceTarget = max([bar.High for bar in self.symbolStrat.bars_rw][0:stopPlacer])
                 stopPrice = max(stopPriceTarget, self.entryPrice + minStopDistance)
                 mintargetPrice = self.entryPrice + minPayOff * (self.entryPrice - stopPrice) if minPayOff!=None else self.entryPrice
-                targetPriceTarget = min([bar.Low for bar in self.symbolStrat.bars_rw][0:targetPlacer]) if targetPlacer!=None else self.entryPrice
+                targetPriceTarget = min([bar.Low for bar in self.symbolStrat.bars_rw][0:targetPlacer])+targetMargin if targetPlacer!=None else self.entryPrice
                 targetPrice = min(mintargetPrice, targetPriceTarget) if minPayOff!=None or targetPlacer!=None else None
                 newTrade = MySIMTrade(self, len(self.positionData), self.entryPrice, stopPrice, targetPrice, scratchTrade, stopTrailer)
             self.positionData.extend(singleTradeOutput)
