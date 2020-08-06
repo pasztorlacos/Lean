@@ -98,6 +98,15 @@
     <Content Include="CustomDataUsingMapFileRegressionAlgorithm.py" />
     <Content Include="LiquidETFUniverseFrameworkAlgorithm.py" />
     <None Include="PL_Stat5\BasicTemplateAlgorithm.py" />
+    <Content Include="PL_Stat14\eq_st14.py" />
+    <Content Include="PL_Stat14\hp.py" />
+    <Content Include="PL_Stat14\main.py" />
+    <Content Include="PL_Stat14\pm.py" />
+    <Content Include="PL_Stat14\pmB.py" />
+    <Content Include="PL_Stat14\sim.py" />
+    <Content Include="PL_Stat14\ta.py" />
+    <Content Include="PL_Stat14\taB.py" />
+    <Content Include="PL_Stat14\var.py" />
     <Content Include="PL_Stat10\eq2_ai_4.py" />
     <Content Include="PL_Stat10\hp3.py" />
     <Content Include="PL_Stat10\main.py" />
