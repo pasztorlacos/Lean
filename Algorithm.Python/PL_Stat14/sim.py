@@ -49,8 +49,7 @@ class MySIMPosition():
                 algo.MyDebug("  Sim Row "+str(item) +":"+ str(cls.rawClosedPositionsData[item]))
             algo.MyDebug("   Sims Opened:" + str(cls.simsOpened) + " Sims Closed:" +str(cls.simsClosed))
             return
-        
-        
+                
         if not os.path.exists(cls.statFolder):
             os.makedirs(cls.statFolder)
               

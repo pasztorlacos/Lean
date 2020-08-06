@@ -551,13 +551,13 @@ class Eq_St14():
                                  self.gasf1.FeatureExtractor(n=8, featureType="ULBG", returnList=True), \
                                  self.gasf1.FeatureExtractor(n=50, featureType="RelativePrice", preProcessor=self.CL.preprocDict["CAE_1D_50-8_sm"]["model"], returnList=True), \
                                  self.gasf1.FeatureExtractor(n=50, featureType="Volatility", preProcessor=self.CL.preprocDict["CAE_1D_50-8_sm"]["model"], returnList=True), \
-                                 self.gasf1.FeatureExtractor_HE(hursts=((1,16),(15,30),(30,45)), inputType="Close", n=None), \
+                                 self.gasf1.FeatureExtractor_HE(hursts=((1,20),(15,35),(30,50)), inputType="Close", n=None), \
                                  self.gasf1_2.FeatureExtractor(n=100, featureType="Close", preProcessor=self.CL.preprocDict["CAE_1D_100-16_sm"]["model"], returnList=True), \
                                  self.gasf1_2.FeatureExtractor(n=8, featureType="ULBG", returnList=True), \
                                  self.gasf1_2.FeatureExtractor(n=50, featureType="RelativePrice", preProcessor=self.CL.preprocDict["CAE_1D_50-8_sm"]["model"], returnList=True), \
                                  self.gasf1_2.FeatureExtractor(n=50, featureType="Volatility", preProcessor=self.CL.preprocDict["CAE_1D_50-8_sm"]["model"], returnList=True), \
                                  self.gasf1_2.FeatureExtractor(n=8, featureType="Volume", returnList=True), \
-                                 self.gasf1_2.FeatureExtractor_HE(hursts=((1,16),(15,30),(30,45)), inputType="Close", n=None)]
+                                 self.gasf1_2.FeatureExtractor_HE(hursts=((1,20),(15,35),(30,50)), inputType="Close", n=None)]
         
         if loadFeatures2:
             self.rawFeatures2 = []
