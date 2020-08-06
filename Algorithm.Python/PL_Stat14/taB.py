@@ -603,6 +603,7 @@ class MyGASF():
         tau = [sqrt(np.std(np.subtract(x[:-lag], x[lag:]))) for lag in lags]
         m = np.polyfit(np.log(lags), np.log(tau), 1)
         hurst = m[0]*2
+        hurst = max(0.00, min(1.00, hurst))
         return hurst
     
     def FeatureExtractor_HE(self, hursts, inputType="Close", n=None):
